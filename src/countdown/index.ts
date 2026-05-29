@@ -7,6 +7,7 @@ export type {
   CountdownState,
   SlotNode,
   SlotType,
+  SlotTrigger,
 } from './theming/types'
 export {
   useCountdownData,
@@ -19,3 +20,9 @@ export type {
   CountdownEventListener,
   CountdownEventPayload,
 } from './data/events'
+export {
+  registerEffect,
+  getEffect,
+  type EffectImpl,
+  type EffectContext,
+} from './theming/effects'

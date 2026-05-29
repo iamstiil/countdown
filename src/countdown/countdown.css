@@ -400,6 +400,36 @@
   border-radius: 2px;
 }
 
+/* --- Sprite ------------------------------------------------------------- */
+
+[data-ct-theme] [data-slot='sprite'] {
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-ct-theme] [data-sprite-frame] {
+  /* The strip is laid out horizontally; we translate background-position-x
+     from 0 to --ct-sprite-strip-end (negative px) in steps(frames). */
+  background-position: 0 0;
+}
+
+@keyframes ct-sprite-strip {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: var(--ct-sprite-strip-end, 0);
+  }
+}
+
+/* --- Particles & effect layers ----------------------------------------- */
+
+[data-ct-theme] [data-slot='particles'],
+[data-ct-theme] [data-slot='effect-layer'] {
+  display: block;
+}
+
 /* --- Reduced motion ----------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {

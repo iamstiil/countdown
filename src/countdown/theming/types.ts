@@ -1,5 +1,7 @@
 import type { ComponentType, CSSProperties, ReactNode } from 'react'
 
+import type { CountdownEventName } from '../data/events'
+
 export type Breakpoint = 'base' | 'sm' | 'md' | 'lg' | 'xl'
 
 export type SlotType =
@@ -10,6 +12,16 @@ export type SlotType =
   | 'progress'
   | 'background'
   | 'group'
+  | 'sprite'
+  | 'particles'
+  | 'effect-layer'
+
+/**
+ * When a slot reacts to bus events, themes pass either the literal
+ * `'mount'` (fire once when mounted) or `'loop'` (repeat continuously)
+ * or any `CountdownEventName`.
+ */
+export type SlotTrigger = 'mount' | 'loop' | CountdownEventName
 
 export interface SlotBehaviorMap {
   timer: {
@@ -59,6 +71,54 @@ export interface SlotBehaviorMap {
     loop?: boolean
   }
   group: Record<string, never>
+  sprite: {
+    /** URL or data URI of the sprite sheet image. */
+    src: string
+    /** Single-frame width in CSS pixels (sheet is a horizontal strip). */
+    frameWidth: number
+    /** Single-frame height in CSS pixels. */
+    frameHeight: number
+    /** Total frame count in the strip. */
+    frames: number
+    /** Playback speed in frames per second. Default 8. */
+    fps?: number
+    /** When playback should (re)start. Default `'mount'`. */
+    playOn?: SlotTrigger
+    /** Loop the animation indefinitely. Default false. */
+    loop?: boolean
+    /** Render with `image-rendering: pixelated` for pixel art. */
+    pixelated?: boolean
+    /** Optional accessible label; sprite gets `role="img"` when set. */
+    label?: string
+  }
+  particles: {
+    /** Built-in particle kind. */
+    kind: 'confetti' | 'sand' | 'bubbles' | 'sparks'
+    /** Number of particles in the system at peak. Default kind-specific. */
+    count?: number
+    /** Per-particle lifetime in ms. Default kind-specific. */
+    lifetimeMs?: number
+    /** Color palette (CSS colors) picked from at random. */
+    palette?: string[]
+    /** When new bursts should emit. `'loop'` = continuous spawn. */
+    trigger?: SlotTrigger
+    /** Gravity in px/sec². Positive = down. Default kind-specific. */
+    gravity?: number
+    /** Horizontal drift in px/sec. Default 0. */
+    wind?: number
+  }
+  'effect-layer': {
+    /**
+     * Named effect implementation. Effects live in a small registry
+     * (`effectRegistry`) so theme authors compose by name rather than
+     * shipping their own canvas code.
+     */
+    effect: string
+    /** Free-form options forwarded to the effect implementation. */
+    options?: Record<string, unknown>
+    /** When the effect should (re)trigger. Default `'mount'`. */
+    trigger?: SlotTrigger
+  }
 }
 
 /** Mobile-first responsive value: `base` required, overrides optional. */
