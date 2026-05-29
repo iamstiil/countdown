@@ -1,16 +1,23 @@
-description: Prepares the repo for a typical CI job
+description: Sets up Node.js + pnpm and installs dependencies with caching.
 
 name: Prepare
 
 runs:
+  using: composite
   steps:
     - name: Install pnpm
       uses: pnpm/action-setup@v4
+
     - name: Use Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '24'
+        # Caches the pnpm store keyed by pnpm-lock.yaml; dramatically speeds
+        # up installs after the first run.
+        cache: 'pnpm'
+
     - name: Install dependencies
-      run: pnpm install
+      # --frozen-lockfile makes CI fail if pnpm-lock.yaml drifts from
+      # package.json, ensuring reproducible builds.
+      run: pnpm install --frozen-lockfile
       shell: bash
-  using: composite
