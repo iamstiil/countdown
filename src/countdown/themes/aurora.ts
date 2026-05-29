@@ -10,10 +10,11 @@ export const auroraTheme: CountdownTheme = {
   tokens: {
     base: {
       color: {
-        bg: '#0f1023',
+        bg: '#0b0c20',
         fg: '#f5f3ff',
-        accent: '#a78bfa', // violet-400
-        muted: '#9ca3af', // gray-400
+        accent: '#c4b5fd', // violet-300 — slightly brighter for digit punch
+        muted: '#c7d2fe', // indigo-200
+        title: '#c4b5fd',
       },
       font: {
         display: '"Inter", system-ui, sans-serif',
@@ -21,12 +22,12 @@ export const auroraTheme: CountdownTheme = {
       },
       size: {
         timer: 'clamp(2.5rem, 10vw, 6.5rem)',
-        title: '0.8rem',
-        label: '0.7rem',
+        title: '0.78rem',
+        label: '0.68rem',
       },
       motion: { fast: '200ms', slow: '900ms' },
       effect: {
-        card: '0 1px 0 0 color-mix(in oklab, white, transparent 88%) inset, 0 30px 60px -20px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in oklab, white, transparent 88%)',
+        card: '0 1px 0 0 color-mix(in oklab, white, transparent 82%) inset, 0 40px 80px -24px rgba(0,0,0,0.55), 0 0 0 1px color-mix(in oklab, white, transparent 88%)',
       },
     },
     md: {
@@ -38,18 +39,18 @@ export const auroraTheme: CountdownTheme = {
     type: 'group',
     classes: {
       className: {
-        base: 'relative min-h-screen w-full grid place-items-center overflow-hidden isolate bg-[color:var(--ct-color-bg)] p-4',
+        base: 'relative min-h-screen w-full grid place-items-center overflow-hidden isolate bg-[color:var(--ct-color-bg)] p-4 md:p-8',
       },
     },
     children: [
-      // Aurora mesh background — three soft radial gradients
+      // Aurora mesh background — richer multi-stop radial blobs
       {
         id: 'bg-mesh',
         type: 'background',
         props: { kind: 'gradient' },
         classes: {
           className: {
-            base: 'absolute inset-0 -z-10 [background-image:radial-gradient(at_20%_20%,#a78bfa55_0,transparent_50%),radial-gradient(at_80%_30%,#22d3ee44_0,transparent_50%),radial-gradient(at_50%_90%,#f472b644_0,transparent_50%)]',
+            base: 'absolute inset-0 -z-10 [background-image:radial-gradient(at_18%_18%,#a78bfa66_0,transparent_55%),radial-gradient(at_82%_28%,#22d3ee55_0,transparent_55%),radial-gradient(at_50%_92%,#f472b655_0,transparent_55%)]',
           },
         },
       },
@@ -60,7 +61,7 @@ export const auroraTheme: CountdownTheme = {
         props: { kind: 'gradient' },
         classes: {
           className: {
-            base: 'absolute inset-0 -z-10 opacity-[0.04] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:3px_3px]',
+            base: 'absolute inset-0 -z-10 opacity-[0.05] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:3px_3px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]',
           },
         },
       },
@@ -70,8 +71,8 @@ export const auroraTheme: CountdownTheme = {
         type: 'group',
         classes: {
           className: {
-            base: 'relative flex flex-col items-center gap-6 px-6 py-10 rounded-3xl backdrop-blur-2xl bg-white/[0.04] shadow-[var(--ct-effect-card)] w-full max-w-[min(90vw,46rem)]',
-            md: 'md:gap-8 md:px-12 md:py-14',
+            base: 'relative flex flex-col items-center gap-8 px-7 py-12 rounded-3xl backdrop-blur-2xl bg-white/[0.05] shadow-[var(--ct-effect-card)] w-full max-w-[min(92vw,44rem)]',
+            md: 'md:gap-10 md:px-14 md:py-16',
           },
         },
         children: [
@@ -90,7 +91,9 @@ export const auroraTheme: CountdownTheme = {
                 'ct-unit-min-width': '3.5ch',
                 'ct-weight-timer': '500',
                 'ct-tracking-timer': '-0.02em',
-                'ct-color-accent': '#f5f3ff',
+                'ct-color-value': '#ffffff',
+                'ct-color-label':
+                  'color-mix(in oklab, var(--ct-color-fg), transparent 50%)',
               },
               md: {
                 'ct-timer-gap': '2rem',
@@ -105,7 +108,14 @@ export const auroraTheme: CountdownTheme = {
               className: { base: 'w-full max-w-sm' },
             },
             vars: {
-              base: { 'ct-segment-height': '4px', 'ct-segment-gap': '6px' },
+              base: {
+                'ct-segment-height': '5px',
+                'ct-segment-gap': '7px',
+                'ct-color-progress-track':
+                  'color-mix(in oklab, white, transparent 88%)',
+                'ct-color-progress-fill':
+                  'linear-gradient(90deg, #a78bfa, #22d3ee)',
+              },
             },
           },
         ],

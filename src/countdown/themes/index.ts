@@ -15,10 +15,10 @@ export type ThemeId = keyof typeof themeRegistry
 /** Visual preview swatch used by the landing page picker. */
 export const themeSwatch: Record<ThemeId, string> = {
   'neon-grid':
-    'radial-gradient(ellipse at 50% 50%, #7dd3fc55 0%, transparent 60%), #070912',
-  'minimal-stack': 'linear-gradient(180deg, #fafaf7 0%, #efeae3 100%)',
+    'radial-gradient(ellipse at 50% 45%, #67e8f955 0%, transparent 60%), #050813',
+  'minimal-stack': 'linear-gradient(180deg, #faf8f4 0%, #ede7dd 100%)',
   aurora:
-    'radial-gradient(at 20% 20%, #a78bfa88 0, transparent 50%), radial-gradient(at 80% 30%, #22d3ee66 0, transparent 50%), radial-gradient(at 50% 90%, #f472b666 0, transparent 50%), #0f1023',
+    'radial-gradient(at 18% 18%, #a78bfa88 0, transparent 55%), radial-gradient(at 82% 28%, #22d3ee66 0, transparent 55%), radial-gradient(at 50% 92%, #f472b666 0, transparent 55%), #0b0c20',
 }
 
 export const themeList: ReadonlyArray<{

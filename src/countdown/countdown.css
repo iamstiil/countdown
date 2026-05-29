@@ -18,14 +18,17 @@
   overflow: auto;
   z-index: 50;
 
+  /* Respect notches / home indicators on mobile. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+
   color: var(--ct-color-fg, inherit);
   background-color: var(--ct-color-bg, transparent);
   font-family: var(--ct-font-display, inherit);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings:
-    'ss01' on,
-    'cv11' on;
+  text-rendering: optimizeLegibility;
 }
 
 [data-ct-theme] .ct-root {
@@ -39,22 +42,34 @@
 [data-ct-theme] [data-slot='event-title'] {
   margin: 0;
   font-family: var(--ct-font-display, inherit);
-  font-size: var(--ct-size-title, 1rem);
+  font-size: var(--ct-size-title, clamp(0.8rem, 1.6vw, 1rem));
   font-weight: var(--ct-weight-title, 500);
-  letter-spacing: var(--ct-tracking-title, 0.24em);
+  letter-spacing: var(--ct-tracking-title, 0.22em);
   text-transform: var(--ct-case-title, uppercase);
-  color: var(--ct-color-muted, currentColor);
+  /* Slightly stronger than muted for better hierarchy without losing the
+     "eyebrow" feel. Themes override via --ct-color-title if needed. */
+  color: var(
+    --ct-color-title,
+    color-mix(in oklab, var(--ct-color-fg, currentColor), transparent 35%)
+  );
   line-height: 1.2;
+  max-width: 60ch;
+  text-wrap: balance;
 }
 
 /* --- Timer -------------------------------------------------------------- */
 
 [data-ct-theme] [data-slot='timer'] {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: var(--ct-timer-gap, 1.5rem);
+  justify-content: var(--ct-timer-justify, inherit);
+  gap: var(--ct-timer-gap, clamp(0.75rem, 3vw, 2rem));
   font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum' on;
+  font-feature-settings:
+    'tnum' on,
+    'ss01' on,
+    'cv11' on;
   text-shadow: var(--ct-text-shadow, none);
 }
 
@@ -62,7 +77,7 @@
   display: flex;
   flex-direction: column;
   align-items: var(--ct-unit-align, center);
-  gap: var(--ct-unit-gap, 0.5rem);
+  gap: var(--ct-unit-gap, clamp(0.35rem, 0.8vw, 0.7rem));
   min-width: var(--ct-unit-min-width, 0);
 }
 
@@ -72,17 +87,19 @@
   font-weight: var(--ct-weight-timer, 600);
   letter-spacing: var(--ct-tracking-timer, -0.04em);
   line-height: 0.9;
-  color: var(--ct-color-accent, currentColor);
+  color: var(--ct-color-value, var(--ct-color-accent, currentColor));
+  font-variant-numeric: tabular-nums;
   transition: color var(--ct-motion-fast, 200ms) ease;
 }
 
 [data-ct-theme] [data-slot='timer'] [data-label] {
   font-family: var(--ct-font-label, var(--ct-font-display, inherit));
-  font-size: var(--ct-size-label, 0.75rem);
+  font-size: var(--ct-size-label, 0.72rem);
   font-weight: var(--ct-weight-label, 500);
-  letter-spacing: var(--ct-tracking-label, 0.2em);
+  letter-spacing: var(--ct-tracking-label, 0.18em);
   text-transform: var(--ct-case-label, uppercase);
-  color: var(--ct-color-muted, currentColor);
+  color: var(--ct-color-label, var(--ct-color-muted, currentColor));
+  opacity: var(--ct-opacity-label, 0.85);
 }
 
 /* --- Separator ---------------------------------------------------------- */
@@ -92,7 +109,7 @@
   font-size: var(--ct-size-timer, inherit);
   font-weight: var(--ct-weight-timer, 600);
   color: var(--ct-color-muted, currentColor);
-  opacity: 0.4;
+  opacity: 0.35;
   line-height: 0.9;
   user-select: none;
 }
@@ -103,10 +120,9 @@
   position: relative;
   width: 100%;
   height: var(--ct-progress-height, 3px);
-  background: color-mix(
-    in oklab,
-    var(--ct-color-muted, currentColor),
-    transparent 80%
+  background: var(
+    --ct-color-progress-track,
+    color-mix(in oklab, var(--ct-color-muted, currentColor), transparent 80%)
   );
   border-radius: 999px;
   overflow: hidden;
@@ -115,7 +131,10 @@
 [data-ct-theme] [data-slot='progress'][data-kind='bar'] > span {
   display: block;
   height: 100%;
-  background: var(--ct-color-accent, currentColor);
+  background: var(
+    --ct-color-progress-fill,
+    var(--ct-color-accent, currentColor)
+  );
   border-radius: inherit;
   transition: width var(--ct-motion-slow, 800ms) cubic-bezier(0.22, 1, 0.36, 1);
   box-shadow: var(--ct-effect-progress-glow, none);
@@ -132,26 +151,38 @@
 
 [data-ct-theme] [data-slot='progress'][data-kind='segments'] {
   display: flex;
-  gap: var(--ct-segment-gap, 4px);
+  gap: var(--ct-segment-gap, 6px);
   align-items: center;
 }
 
 [data-ct-theme] [data-slot='progress'][data-kind='segments'] > span {
   flex: 1;
   height: var(--ct-segment-height, 6px);
-  border-radius: 2px;
-  background: color-mix(
-    in oklab,
-    var(--ct-color-muted, currentColor),
-    transparent 75%
+  border-radius: 999px;
+  background: var(
+    --ct-color-progress-track,
+    color-mix(in oklab, var(--ct-color-muted, currentColor), transparent 75%)
   );
-  transition: background var(--ct-motion-fast, 200ms) ease;
+  transition:
+    background var(--ct-motion-fast, 200ms) ease,
+    transform var(--ct-motion-fast, 200ms) ease;
 }
 
 [data-ct-theme]
   [data-slot='progress'][data-kind='segments']
   > span[data-on='true'] {
-  background: var(--ct-color-accent, currentColor);
+  background: var(
+    --ct-color-progress-fill,
+    var(--ct-color-accent, currentColor)
+  );
+}
+
+/* --- Focus visibility (any focusable child) ----------------------------- */
+
+[data-ct-theme] :focus-visible {
+  outline: 2px solid var(--ct-color-accent, currentColor);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 /* --- Reduced motion ----------------------------------------------------- */

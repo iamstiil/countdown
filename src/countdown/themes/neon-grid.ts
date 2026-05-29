@@ -11,10 +11,11 @@ export const neonGridTheme: CountdownTheme = {
   tokens: {
     base: {
       color: {
-        bg: '#070912',
-        fg: '#e9eefc',
-        accent: '#7dd3fc', // sky-300
-        muted: '#64748b', // slate-500
+        bg: '#050813',
+        fg: '#eef2ff',
+        accent: '#67e8f9', // cyan-300, richer than sky-300
+        muted: '#475569', // slate-600
+        title: '#a5b4fc', // indigo-300 — gives the eyebrow life
       },
       font: {
         display: '"Space Grotesk", "Inter", system-ui, sans-serif',
@@ -22,15 +23,15 @@ export const neonGridTheme: CountdownTheme = {
       },
       size: {
         timer: 'clamp(3rem, 13vw, 7.5rem)',
-        title: 'clamp(0.75rem, 2.4vw, 0.95rem)',
-        label: '0.7rem',
+        title: 'clamp(0.75rem, 2vw, 0.9rem)',
+        label: '0.68rem',
       },
       space: { '1': '0.25rem', '4': '1rem', '8': '2rem' },
       motion: { fast: '200ms', slow: '900ms' },
       effect: {
         glow: '0 0 28px color-mix(in oklab, var(--ct-color-accent), transparent 55%), 0 0 80px color-mix(in oklab, var(--ct-color-accent), transparent 75%)',
         'progress-glow':
-          '0 0 12px color-mix(in oklab, var(--ct-color-accent), transparent 50%)',
+          '0 0 16px color-mix(in oklab, var(--ct-color-accent), transparent 40%), 0 0 32px color-mix(in oklab, var(--ct-color-accent), transparent 70%)',
       },
     },
     md: {
@@ -46,6 +47,17 @@ export const neonGridTheme: CountdownTheme = {
       },
     },
     children: [
+      // Vignette to deepen edges
+      {
+        id: 'bg-vignette',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.55)_100%)]',
+          },
+        },
+      },
       // Layered ambient background: radial accent halo
       {
         id: 'bg-glow',
@@ -53,18 +65,18 @@ export const neonGridTheme: CountdownTheme = {
         props: { kind: 'gradient' },
         classes: {
           className: {
-            base: 'absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,color-mix(in_oklab,var(--ct-color-accent),transparent_75%),transparent_70%)]',
+            base: 'absolute inset-0 -z-20 bg-[radial-gradient(ellipse_55%_45%_at_50%_45%,color-mix(in_oklab,var(--ct-color-accent),transparent_72%),transparent_70%)]',
           },
         },
       },
-      // Faint grid pattern overlay
+      // Fine grid pattern overlay (32px, masked, low opacity)
       {
         id: 'bg-grid',
         type: 'background',
         props: { kind: 'gradient' },
         classes: {
           className: {
-            base: 'absolute inset-0 -z-10 opacity-[0.12] [background-image:linear-gradient(to_right,color-mix(in_oklab,var(--ct-color-accent),transparent_70%)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--ct-color-accent),transparent_70%)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_60%_50%_at_center,black_30%,transparent_75%)]',
+            base: 'absolute inset-0 -z-20 opacity-[0.10] [background-image:linear-gradient(to_right,color-mix(in_oklab,var(--ct-color-accent),transparent_60%)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--ct-color-accent),transparent_60%)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_center,black_30%,transparent_75%)]',
           },
         },
       },
@@ -74,8 +86,8 @@ export const neonGridTheme: CountdownTheme = {
         type: 'group',
         classes: {
           className: {
-            base: 'relative flex flex-col items-center gap-6 px-6 text-center',
-            md: 'md:gap-10',
+            base: 'relative flex flex-col items-center gap-10 px-6 py-12 text-center w-full max-w-3xl',
+            md: 'md:gap-16 md:py-16',
           },
         },
         children: [
@@ -90,11 +102,15 @@ export const neonGridTheme: CountdownTheme = {
             props: { format: 'dhms', padZeros: true },
             vars: {
               base: {
-                'ct-timer-gap': '1.25rem',
+                'ct-timer-gap': '1.75rem',
+                'ct-unit-gap': '0.75rem',
                 'ct-unit-min-width': '3.5ch',
+                'ct-color-label':
+                  'color-mix(in oklab, var(--ct-color-fg), transparent 55%)',
               },
               md: {
-                'ct-timer-gap': '2.5rem',
+                'ct-timer-gap': '3.5rem',
+                'ct-unit-gap': '1rem',
                 'ct-unit-min-width': '4ch',
               },
             },
@@ -105,14 +121,20 @@ export const neonGridTheme: CountdownTheme = {
             },
           },
           {
-            id: 'ring',
+            id: 'bar',
             type: 'progress',
-            props: { kind: 'ring', direction: 'remaining' },
-            visible: { base: false, md: true },
+            props: { kind: 'bar', direction: 'elapsed' },
             classes: {
               className: {
-                base: '',
-                md: 'md:w-32 md:h-32 md:opacity-90',
+                base: 'w-full max-w-sm mt-2',
+                md: 'md:max-w-md md:mt-4',
+              },
+            },
+            vars: {
+              base: {
+                'ct-progress-height': '3px',
+                'ct-color-progress-track':
+                  'color-mix(in oklab, var(--ct-color-accent), transparent 88%)',
               },
             },
           },
