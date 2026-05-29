@@ -10,7 +10,12 @@ export default defineConfig({
   build: {
     sourcemap: true,
   },
-  plugins: [react(), EnvironmentPlugin(['REACT_APP_TEXT'])],
+  plugins: [
+    react(),
+    // Object form: values are used as defaults when the env var is unset,
+    // so the build doesn't fail in CI (where .env isn't checked in).
+    EnvironmentPlugin({ REACT_APP_TEXT: "I'm REACT_APP_TEXT from .env" }),
+  ],
   publicDir: 'public',
   server: {
     host: true,
