@@ -1,5 +1,7 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
+
+import { useContinuousProgress } from '../data/CountdownDataContext'
 
 import { buildTokenCSS } from './buildTokenCSS'
 import { SlotRenderer } from './Renderer'
@@ -23,8 +25,22 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
     [theme],
   )
 
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  const { subscribe } = useContinuousProgress()
+
+  // Drive the continuous --ct-progress CSS variable on the theme root.
+  // Themes can read it via `var(--ct-progress)` for smooth motion that
+  // doesn't depend on React's 1Hz tick.
+  useEffect(() => {
+    const el = rootRef.current
+    if (!el) return
+    return subscribe((value) => {
+      el.style.setProperty('--ct-progress', value.toFixed(4))
+    })
+  }, [subscribe])
+
   const tree = (
-    <div data-ct-theme={theme.id} className="ct-root">
+    <div ref={rootRef} data-ct-theme={theme.id} className="ct-root">
       <style>{tokenCSS}</style>
       {animationCSS && <style>{animationCSS}</style>}
       <SlotRenderer node={theme.layout} />

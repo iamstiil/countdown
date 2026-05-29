@@ -27,6 +27,18 @@ export interface SlotBehaviorMap {
   progress: {
     kind?: 'bar' | 'ring' | 'segments'
     direction?: 'elapsed' | 'remaining'
+    /**
+     * How the rendered value moves over time. `linear` (default) is the
+     * monotonic elapsed fraction sampled every second. `breathe` overlays a
+     * slow sine modulation on top of monotonic progress — useful for things
+     * like a tide that swells and recedes while net-rising. `pulse` adds a
+     * short pip on each `secondTick`.
+     */
+    motion?: 'linear' | 'breathe' | 'pulse'
+    /** Amplitude of the breathe modulation (0..1 of total span). Default 0.015. */
+    breatheAmplitude?: number
+    /** Period of the breathe modulation in milliseconds. Default 9000. */
+    breathePeriodMs?: number
   }
   background: {
     kind?: 'image' | 'video' | 'gradient' | 'canvas'

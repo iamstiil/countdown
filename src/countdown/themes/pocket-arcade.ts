@@ -130,11 +130,18 @@ export const pocketArcadeTheme: CountdownTheme = {
       [data-ct-theme="pocket-arcade"] [data-unit-block="seconds"] [data-value] {
         color: #5dffb0;
         text-shadow: 0 0 6px rgba(93, 255, 176, 0.9), 0 0 18px rgba(93, 255, 176, 0.5);
-        animation: pa-pulse 1s steps(2, end) infinite;
       }
-      @keyframes pa-pulse {
-        0%, 100% { opacity: 1; }
-        50%      { opacity: 0.78; }
+      /* Phase 1: real tick-driven flash on the seconds digit. */
+      [data-ct-theme="pocket-arcade"] [data-value][data-just-changed="seconds"] {
+        animation: pa-tick 220ms steps(2, end);
+      }
+      /* Per-minute display flash via the progress[motion=pulse] hook. */
+      [data-ct-theme="pocket-arcade"] [data-slot="progress"][data-motion="pulse"][data-just-changed] ~ * {
+        /* sibling-target hook (unused, placeholder for Phase 3 events) */
+      }
+      @keyframes pa-tick {
+        0%   { opacity: 0.4; transform: translateY(-1px); }
+        100% { opacity: 1;   transform: translateY(0); }
       }
       [data-ct-theme="pocket-arcade"] [data-slot="timer"] [data-label] {
         font-family: var(--ct-font-label);

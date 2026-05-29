@@ -74,25 +74,33 @@ export const tideLettersTheme: CountdownTheme = {
           0 0.6px 0.4px rgba(29, 27, 58, 0.35),
           0 0 12px rgba(29, 27, 58, 0.18),
           0 0 26px rgba(44, 106, 106, 0.10);
-        animation: tl-bleed 4.8s ease-in-out infinite;
+        transition: text-shadow 1200ms ease-out;
       }
-      [data-ct-theme="tide-letters"] [data-slot="timer"] [data-unit-block]:nth-child(2) [data-value] { animation-delay: -1.2s; }
-      [data-ct-theme="tide-letters"] [data-slot="timer"] [data-unit-block]:nth-child(3) [data-value] { animation-delay: -2.4s; }
-      [data-ct-theme="tide-letters"] [data-slot="timer"] [data-unit-block]:nth-child(4) [data-value] { animation-delay: -3.6s; }
-      @keyframes tl-bleed {
-        0%, 100% {
+      /* Tick-driven bleed pulse: Phase 1 'data-just-changed' attribute. */
+      [data-ct-theme="tide-letters"] [data-slot="timer"] [data-value][data-just-changed] {
+        animation: tl-bleed-pulse 1100ms ease-out;
+      }
+      @keyframes tl-bleed-pulse {
+        0% {
           text-shadow:
             0 0 1.2px rgba(29, 27, 58, 0.55),
             0 0.6px 0.4px rgba(29, 27, 58, 0.35),
             0 0 12px rgba(29, 27, 58, 0.18),
             0 0 26px rgba(44, 106, 106, 0.10);
         }
-        50% {
+        20% {
           text-shadow:
-            0 0 1.6px rgba(29, 27, 58, 0.70),
-            0 0.6px 0.4px rgba(29, 27, 58, 0.45),
-            0 0 18px rgba(29, 27, 58, 0.28),
-            0 0 38px rgba(44, 106, 106, 0.18);
+            0 0 2.2px rgba(29, 27, 58, 0.85),
+            0 0.6px 0.4px rgba(29, 27, 58, 0.55),
+            0 0 24px rgba(29, 27, 58, 0.35),
+            0 0 48px rgba(44, 106, 106, 0.25);
+        }
+        100% {
+          text-shadow:
+            0 0 1.2px rgba(29, 27, 58, 0.55),
+            0 0.6px 0.4px rgba(29, 27, 58, 0.35),
+            0 0 12px rgba(29, 27, 58, 0.18),
+            0 0 26px rgba(44, 106, 106, 0.10);
         }
       }
     `,
@@ -154,17 +162,21 @@ export const tideLettersTheme: CountdownTheme = {
           0 0 12px rgba(44, 106, 106, 0.45),
           0 6px 24px rgba(44, 106, 106, 0.18);
       }
-      /* The watercolor pool that grows beneath the tideline. */
+      /* The watercolor pool that grows beneath the tideline.
+         Height tracks continuous progress (--ct-progress, Phase 1) so the
+         pool genuinely rises as the countdown elapses, while a slow CSS
+         breath sits on top for ambient motion. */
       [data-ct-theme="tide-letters"] .tl-pool {
         position: absolute;
         left: 0; right: 0; bottom: 0;
-        height: 22vh;
+        height: calc(8vh + (var(--ct-progress, 0) * 60vh));
         pointer-events: none;
         background:
           radial-gradient(ellipse 60% 70% at 30% 20%, rgba(44, 106, 106, 0.28), transparent 70%),
           radial-gradient(ellipse 50% 60% at 75% 30%, rgba(29, 27, 58, 0.22), transparent 70%),
           linear-gradient(to top, rgba(44, 106, 106, 0.22), transparent);
         filter: blur(8px);
+        transition: height 1200ms cubic-bezier(0.22, 1, 0.36, 1);
         animation: tl-breathe 9s ease-in-out infinite;
       }
       @keyframes tl-breathe {
@@ -256,7 +268,14 @@ export const tideLettersTheme: CountdownTheme = {
           {
             id: 'tide',
             type: 'progress',
-            props: { kind: 'bar', direction: 'elapsed' },
+            props: {
+              kind: 'bar',
+              direction: 'elapsed',
+              // Phase 1: real breath modulation, not a decorative loop.
+              motion: 'breathe',
+              breatheAmplitude: 0.012,
+              breathePeriodMs: 9000,
+            },
             classes: {
               className: { base: 'relative w-full' },
             },
