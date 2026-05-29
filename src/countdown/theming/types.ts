@@ -94,11 +94,46 @@ export type PartialTokens = Partial<{
   [K in keyof TokenSet]: Partial<TokenSet[K]>
 }>
 
+/**
+ * Lifecycle state the countdown can be in. Stamped onto the theme root as
+ * `data-state="<state>"` by `CountdownThemeProvider` so themes can react in
+ * CSS. Themes may also supply alternate layouts (see `CountdownTheme`).
+ *
+ * - `counting` — the default steady-state count.
+ * - `final-minute` — remaining time has crossed below one minute. Themes
+ *   typically dial up intensity here.
+ * - `done` — remaining time has reached zero. Themes may show a "done"
+ *   reveal (bloom, win screen, etc.).
+ * - `idle` — user has been inactive for at least `idleAfterMs`. Idle
+ *   preempts `counting` and `final-minute` but never `done`.
+ */
+export type CountdownState = 'counting' | 'final-minute' | 'done' | 'idle'
+
 export interface CountdownTheme {
   id: string
   name: string
   tokens: Responsive<PartialTokens>
   layout: SlotNode<'group'>
+  /**
+   * Optional alternate layout rendered when the countdown enters the
+   * final minute. Falls back to `layout` when absent.
+   */
+  finalLayout?: SlotNode<'group'>
+  /**
+   * Optional alternate layout rendered when the countdown reaches zero.
+   * Falls back to `layout` when absent.
+   */
+  doneLayout?: SlotNode<'group'>
+  /**
+   * Optional alternate layout rendered after the user has been inactive
+   * for `idleAfterMs`. Falls back to `layout` when absent.
+   */
+  idleLayout?: SlotNode<'group'>
+  /**
+   * Milliseconds of pointer/key/touch inactivity before the theme switches
+   * to the `idle` state. Omit to disable idle entirely.
+   */
+  idleAfterMs?: number
   /** Optional keyframes/animation rules injected as a <style> block. */
   animations?: Record<string, string>
 }

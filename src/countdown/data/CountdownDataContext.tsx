@@ -34,6 +34,12 @@ export interface CountdownData {
   /** 0..1 elapsed fraction (clamped, second-granular). */
   elapsedFraction: number
   isDone: boolean
+  /**
+   * Lifecycle phase derived purely from `remaining`. Provider does NOT
+   * compute the orthogonal `idle` state — that is the theme provider's
+   * responsibility since it depends on per-theme `idleAfterMs`.
+   */
+  lifecycleState: 'counting' | 'final-minute' | 'done'
 }
 
 const computeRemaining = (target: Date): Remaining => {
@@ -208,6 +214,12 @@ export function CountdownDataProvider({
     const elapsed =
       targetDate.getTime() - effectiveStart.getTime() - remaining.total
     const elapsedFraction = Math.min(1, Math.max(0, elapsed / span))
+    const lifecycleState: CountdownData['lifecycleState'] =
+      remaining.total === 0
+        ? 'done'
+        : remaining.total <= 60_000
+          ? 'final-minute'
+          : 'counting'
     return {
       targetDate,
       startDate: effectiveStart,
@@ -216,6 +228,7 @@ export function CountdownDataProvider({
       remaining,
       elapsedFraction,
       isDone: remaining.total === 0,
+      lifecycleState,
     }
   }, [targetDate, effectiveStart, title, subtitle, remaining])
 
@@ -272,4 +285,25 @@ export function useContinuousProgress(): ContinuousProgress {
     )
   }
   return ref
+}
+
+/**
+ * Run an imperative effect on a countdown lifecycle event. The handler is
+ * (re)subscribed whenever any value in `deps` changes; it is automatically
+ * unsubscribed on unmount or before re-subscription.
+ *
+ * Use when a theme needs a one-shot side effect (fireworks emit, audio
+ * cue, sprite spawn) that should fire on a bus event rather than on every
+ * render.
+ */
+export function useThemeEffect(
+  event: CountdownEventName,
+  handler: CountdownEventListener,
+  deps: ReadonlyArray<unknown> = [],
+): void {
+  const { subscribe } = useCountdownEvents()
+  useEffect(() => {
+    return subscribe(event, handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event, subscribe, ...deps])
 }

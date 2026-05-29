@@ -37,6 +37,44 @@
   min-height: 100%;
 }
 
+/* --- State layers ------------------------------------------------------- */
+/*
+ * The theme provider may render multiple layout layers during a state
+ * transition (counting → final-minute → done → idle). Layers are stacked
+ * absolutely so they overlap, then crossfaded using --ct-state-fade-ms.
+ * Themes can override the duration token to taste; default is 320ms.
+ */
+
+[data-ct-theme] .ct-layer {
+  position: absolute;
+  inset: 0;
+  display: contents;
+}
+
+/*
+ * When more than one layer is mounted (during a transition), promote them
+ * to absolutely-positioned stacked boxes so they can crossfade.
+ * `:has(~ .ct-layer)` matches when another layer follows; the trailing
+ * layer also needs absolute positioning, handled by `&:not(:only-child)`.
+ */
+[data-ct-theme] .ct-layer:has(~ .ct-layer),
+[data-ct-theme] .ct-layer:not(:only-child) {
+  display: block;
+  inset: 0;
+  transition:
+    opacity var(--ct-state-fade-ms, 320ms) ease,
+    transform var(--ct-state-fade-ms, 320ms) ease;
+}
+
+[data-ct-theme] .ct-layer[data-layer-phase='exit'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-ct-theme] .ct-layer[data-layer-phase='enter'] {
+  opacity: 1;
+}
+
 /* --- Event title -------------------------------------------------------- */
 
 [data-ct-theme] [data-slot='event-title'] {
