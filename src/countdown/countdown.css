@@ -1,0 +1,20 @@
+/*
+ * Countdown theming base styles.
+ * Scoped under [data-ct-theme] so they cannot leak into the landing page.
+ */
+
+[data-ct-theme] {
+  /* Sensible defaults; themes override via CSS variables. */
+  color: var(--ct-color-fg, inherit);
+  background-color: var(--ct-color-bg, transparent);
+  font-family: var(--ct-font-display, inherit);
+}
+
+[data-ct-theme] .ct-root {
+  width: 100%;
+  height: 100%;
+}
+
+[data-ct-theme] [data-slot='timer'] {
+  text-shadow: var(--ct-text-shadow, none);
+}
