@@ -4,16 +4,18 @@ import React from 'react'
 
 import App from './App'
 
-test('Work App Component without error', () => {
+test('Work App Component without error', async () => {
   render(<App />)
 
-  expect(screen.getByText("I'm REACT_APP_TEXT from .env")).toBeInTheDocument()
+  expect(
+    await screen.findByText("I'm REACT_APP_TEXT from .env"),
+  ).toBeInTheDocument()
 })
 
 test('Working Counter', async () => {
   const user = userEvent.setup()
-  const { getByText } = render(<App />)
-  expect(getByText('count is: 0')).toBeInTheDocument()
+  const { findByText, getByText } = render(<App />)
+  expect(await findByText('count is: 0')).toBeInTheDocument()
 
   const button = getByText(/count is: \d/)
 

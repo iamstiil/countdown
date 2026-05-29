@@ -1,0 +1,75 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+# Allow one concurrent deployment; don't cancel in-progress runs so a deploy
+# always finishes cleanly.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+# Minimum permissions required by the official Pages actions.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # CI gate: lint + typecheck + tests must pass before we build/deploy.
+  # ---------------------------------------------------------------------------
+  ci:
+    name: CI (lint, typecheck, test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  # ---------------------------------------------------------------------------
+  # Build the production bundle and upload it as a Pages artifact.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build site
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build
+        run: pnpm build
+
+      # SPA fallback: GitHub Pages serves 404.html for any path it doesn't
+      # recognise. Reusing index.html lets the client-side router handle deep
+      # links like /countdown/some/route on a hard refresh.
+      - name: Add SPA 404 fallback
+        run: cp dist/index.html dist/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  # ---------------------------------------------------------------------------
+  # Deploy the uploaded artifact to the github-pages environment.
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
