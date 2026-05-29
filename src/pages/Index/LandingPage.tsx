@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import React, { memo, useMemo, useState } from 'react'
 
-import { DEFAULT_THEME_ID, themeList } from '../../countdown'
+import { DEFAULT_THEME_ID, ThemePreview, themeList } from '../../countdown'
 import type { ThemeId } from '../../countdown'
 
 import styles from './LandingPage.module.css'
@@ -101,14 +101,10 @@ const LandingPage: React.FC = memo(() => {
                     onClick={() => setTheme(t.id)}
                     className={styles.themeOption}
                   >
-                    <span
+                    <ThemePreview
+                      themeId={t.id}
                       className={styles.themeSwatch}
-                      style={
-                        {
-                          '--swatch': t.swatch,
-                        } as React.CSSProperties
-                      }
-                      aria-hidden="true"
+                      ariaLabel={`${t.name} preview`}
                     />
                     <span className={styles.themeName}>{t.name}</span>
                   </button>

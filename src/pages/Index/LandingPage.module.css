@@ -249,10 +249,9 @@ select.input {
 }
 
 .themeSwatch {
-  height: 56px;
+  width: 100%;
   border-radius: 8px;
   border: 1px solid color-mix(in oklab, var(--lp-fg), transparent 92%);
-  background: var(--swatch, #000);
   overflow: hidden;
 }
 
