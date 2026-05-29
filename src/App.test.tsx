@@ -1,42 +1,45 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 
 import App from './App'
 
-test('Work App Component without error', async () => {
-  render(<App />)
+const renderAt = (search: string) => {
+  window.history.replaceState({}, '', `/${search}`)
+  return render(<App />)
+}
+
+test('shows landing page when no date search param is provided', async () => {
+  renderAt('')
 
   expect(
-    await screen.findByText("I'm REACT_APP_TEXT from .env"),
+    await screen.findByRole('heading', { name: /create a countdown/i }),
   ).toBeInTheDocument()
+  expect(screen.getByLabelText(/target date/i)).toBeInTheDocument()
 })
 
-test('Working Counter', async () => {
+test('shows countdown when date search param is provided', async () => {
+  const future = new Date(Date.now() + 60 * 60 * 1000).toISOString()
+  renderAt(`?date=${encodeURIComponent(future)}&title=Launch`)
+
+  expect(
+    await screen.findByRole('heading', { name: 'Launch' }),
+  ).toBeInTheDocument()
+  expect(screen.getByText(/seconds/i)).toBeInTheDocument()
+})
+
+test('landing page builds a share link when a future date is entered', async () => {
   const user = userEvent.setup()
-  const { findByText, getByText } = render(<App />)
-  expect(await findByText('count is: 0')).toBeInTheDocument()
+  renderAt('')
 
-  const button = getByText(/count is: \d/)
+  const dateInput = await screen.findByLabelText(/target date/i)
+  const titleInput = screen.getByLabelText(/^title/i)
 
-  await user.click(button)
-  expect(getByText('count is: 1')).toBeInTheDocument()
+  await user.clear(dateInput)
+  await user.type(dateInput, '2099-01-01T12:00')
+  await user.type(titleInput, 'Party')
 
-  await user.click(button)
-  expect(getByText('count is: 2')).toBeInTheDocument()
-
-  await user.click(button)
-  expect(getByText('count is: 3')).toBeInTheDocument()
-})
-
-test('working with msw', async () => {
-  render(<App />)
-
-  await waitFor(
-    () => {
-      expect(screen.getByText('MSW')).toBeInTheDocument()
-      expect(screen.getByText('Tailwind CSS')).toBeInTheDocument()
-    },
-    { timeout: 5000 },
-  )
+  expect(
+    await screen.findByRole('link', { name: /start countdown/i }),
+  ).toBeInTheDocument()
 })
