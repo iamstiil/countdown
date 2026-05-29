@@ -12,6 +12,8 @@ const PREVIEW_VARIANT: Record<ThemeId, PreviewVariant> = {
   'minimal-stack': 'bottom-left',
   aurora: 'card',
   monolith: 'monolith',
+  'tide-letters': 'bottom-left',
+  'pocket-arcade': 'card',
 }
 
 export interface ThemePreviewProps {
