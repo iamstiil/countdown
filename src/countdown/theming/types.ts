@@ -17,6 +17,19 @@ export interface SlotBehaviorMap {
     padZeros?: boolean
     /** Which unit to render. If omitted, renders the full grid. */
     unit?: 'days' | 'hours' | 'minutes' | 'seconds'
+    /**
+     * When true, render each character of the value as its own
+     * `<span data-slot="digit" data-digit data-index data-place>` so themes
+     * can address individual digits (transitions, gestures, coloring).
+     * The accessible label remains on the unit's [data-value] wrapper.
+     */
+    splitDigits?: boolean
+    /**
+     * Built-in change transition applied to each digit when its character
+     * changes. Requires `splitDigits: true`. Themes can also key purely off
+     * `[data-digit][data-changing="true"]` for custom animation.
+     */
+    transition?: 'none' | 'flip' | 'split-flap' | 'odometer' | 'fade'
   }
   'timer-separator': { char?: string }
   'timer-label': {

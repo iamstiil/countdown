@@ -250,7 +250,13 @@ export const pocketArcadeTheme: CountdownTheme = {
           {
             id: 'timer',
             type: 'timer',
-            props: { format: 'dhms', padZeros: true },
+            props: {
+              format: 'dhms',
+              padZeros: true,
+              // Phase 2: per-digit DOM + mechanical pixel-style split-flap.
+              splitDigits: true,
+              transition: 'split-flap',
+            },
             vars: {
               base: {
                 'ct-timer-gap': '0.9rem',
