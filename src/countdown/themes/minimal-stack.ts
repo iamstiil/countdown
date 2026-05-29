@@ -43,11 +43,37 @@ export const minimalStackTheme: CountdownTheme = {
       },
     },
     children: [
-      // Top: eyebrow title
+      // Top: eyebrow title + subtitle
       {
-        id: 'title',
-        type: 'event-title',
-        props: { source: 'title' },
+        id: 'top',
+        type: 'group',
+        classes: {
+          className: {
+            base: 'flex flex-col items-start gap-3 md:gap-4',
+          },
+        },
+        children: [
+          {
+            id: 'title',
+            type: 'event-title',
+            props: { source: 'title' },
+          },
+          {
+            id: 'subtitle',
+            type: 'event-title',
+            props: { source: 'subtitle' },
+            vars: {
+              base: {
+                'ct-font-subtitle':
+                  '"Fraunces", "Times New Roman", Georgia, serif',
+                'ct-size-subtitle': 'clamp(1.05rem, 2vw, 1.35rem)',
+                'ct-weight-subtitle': '300',
+                'ct-tracking-subtitle': '-0.01em',
+                'ct-color-subtitle': 'var(--ct-color-muted)',
+              },
+            },
+          },
+        ],
       },
       // Bottom: progress + timer
       {

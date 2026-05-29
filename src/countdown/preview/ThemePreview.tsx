@@ -5,12 +5,13 @@ import type { ThemeId } from '../themes'
 
 import styles from './ThemePreview.module.css'
 
-export type PreviewVariant = 'centered' | 'bottom-left' | 'card'
+export type PreviewVariant = 'centered' | 'bottom-left' | 'card' | 'monolith'
 
 const PREVIEW_VARIANT: Record<ThemeId, PreviewVariant> = {
   'neon-grid': 'centered',
   'minimal-stack': 'bottom-left',
   aurora: 'card',
+  monolith: 'monolith',
 }
 
 export interface ThemePreviewProps {
@@ -57,7 +58,7 @@ export function ThemePreview({
           <span />
           <span />
         </div>
-        <div className={styles.progress} />
+        {variant !== 'monolith' && <div className={styles.progress} />}
       </div>
     </div>
   )

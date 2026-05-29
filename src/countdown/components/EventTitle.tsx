@@ -11,14 +11,16 @@ export function EventTitle({
   const source = props?.source ?? 'title'
   const text = source === 'subtitle' ? data.subtitle : data.title
   if (!text) return null
+  const Tag = source === 'subtitle' ? 'p' : 'h1'
   return (
-    <h1
+    <Tag
       data-slot="event-title"
+      data-source={source}
       data-slot-id={id}
       className={className}
       style={style}
     >
       {text}
-    </h1>
+    </Tag>
   )
 }

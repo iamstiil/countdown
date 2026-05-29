@@ -27,6 +27,7 @@ const rootRoute = createRootRoute({
 export interface CountdownSearch {
   date?: string
   title?: string
+  subtitle?: string
   theme?: ThemeId
 }
 
@@ -37,10 +38,13 @@ export const indexRoute = createRoute({
   validateSearch: (search: Record<string, unknown>): CountdownSearch => {
     const date = typeof search.date === 'string' ? search.date : undefined
     const title = typeof search.title === 'string' ? search.title : undefined
+    const subtitle =
+      typeof search.subtitle === 'string' ? search.subtitle : undefined
     const theme = isThemeId(search.theme) ? search.theme : undefined
     return {
       ...(date ? { date } : {}),
       ...(title ? { title } : {}),
+      ...(subtitle ? { subtitle } : {}),
       ...(theme ? { theme } : {}),
     }
   },

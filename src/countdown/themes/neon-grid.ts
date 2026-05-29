@@ -97,6 +97,17 @@ export const neonGridTheme: CountdownTheme = {
             props: { source: 'title' },
           },
           {
+            id: 'subtitle',
+            type: 'event-title',
+            props: { source: 'subtitle' },
+            vars: {
+              base: {
+                'ct-color-subtitle':
+                  'color-mix(in oklab, var(--ct-color-fg), transparent 40%)',
+              },
+            },
+          },
+          {
             id: 'timer',
             type: 'timer',
             props: { format: 'dhms', padZeros: true },

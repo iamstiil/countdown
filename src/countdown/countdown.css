@@ -57,6 +57,22 @@
   text-wrap: balance;
 }
 
+/* Subtitle: a softer, body-sized counterpoint to the eyebrow title. */
+[data-ct-theme] [data-slot='event-title'][data-source='subtitle'] {
+  font-family: var(--ct-font-subtitle, var(--ct-font-label, inherit));
+  font-size: var(--ct-size-subtitle, clamp(0.85rem, 1.6vw, 1.05rem));
+  font-weight: var(--ct-weight-subtitle, 400);
+  letter-spacing: var(--ct-tracking-subtitle, 0);
+  text-transform: var(--ct-case-subtitle, none);
+  color: var(
+    --ct-color-subtitle,
+    color-mix(in oklab, var(--ct-color-fg, currentColor), transparent 45%)
+  );
+  line-height: 1.45;
+  max-width: 56ch;
+  opacity: var(--ct-opacity-subtitle, 1);
+}
+
 /* --- Timer -------------------------------------------------------------- */
 
 [data-ct-theme] [data-slot='timer'] {
@@ -100,6 +116,8 @@
   text-transform: var(--ct-case-label, uppercase);
   color: var(--ct-color-label, var(--ct-color-muted, currentColor));
   opacity: var(--ct-opacity-label, 0.85);
+  /* Themes can hide labels entirely (e.g. the monolith theme). */
+  display: var(--ct-label-display, block);
 }
 
 /* --- Separator ---------------------------------------------------------- */

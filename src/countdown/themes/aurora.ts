@@ -82,6 +82,21 @@ export const auroraTheme: CountdownTheme = {
             props: { source: 'title' },
           },
           {
+            id: 'subtitle',
+            type: 'event-title',
+            props: { source: 'subtitle' },
+            vars: {
+              base: {
+                'ct-color-subtitle':
+                  'color-mix(in oklab, var(--ct-color-fg), transparent 35%)',
+                'ct-size-subtitle': 'clamp(0.95rem, 1.8vw, 1.15rem)',
+              },
+            },
+            classes: {
+              className: { base: 'text-center -mt-4 md:-mt-6' },
+            },
+          },
+          {
             id: 'timer',
             type: 'timer',
             props: { format: 'dhms', padZeros: true },

@@ -6,7 +6,7 @@ import { indexRoute } from '../../router'
 import LandingPage from './LandingPage'
 
 const Index: React.FC = memo(() => {
-  const { date, title, theme } = indexRoute.useSearch()
+  const { date, title, subtitle, theme } = indexRoute.useSearch()
 
   const targetDate = useMemo(() => {
     if (!date) return null
@@ -22,6 +22,7 @@ const Index: React.FC = memo(() => {
     <CountdownPage
       targetDate={targetDate}
       title={title}
+      subtitle={subtitle}
       initialThemeId={theme}
     />
   )

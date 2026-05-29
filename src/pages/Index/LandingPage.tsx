@@ -19,6 +19,7 @@ const defaultLocalDateTime = (): string => {
 const LandingPage: React.FC = memo(() => {
   const [localDate, setLocalDate] = useState<string>(defaultLocalDateTime)
   const [title, setTitle] = useState<string>('')
+  const [subtitle, setSubtitle] = useState<string>('')
   const [theme, setTheme] = useState<ThemeId>(DEFAULT_THEME_ID)
 
   const target = useMemo(() => {
@@ -34,15 +35,17 @@ const LandingPage: React.FC = memo(() => {
     return {
       date: target.toISOString(),
       ...(title.trim() ? { title: title.trim() } : {}),
+      ...(subtitle.trim() ? { subtitle: subtitle.trim() } : {}),
       theme,
     }
-  }, [target, title, theme])
+  }, [target, title, subtitle, theme])
 
   const shareUrl = useMemo(() => {
     if (!isValid || !search) return ''
     const params = new URLSearchParams()
     params.set('date', search.date)
     if (search.title) params.set('title', search.title)
+    if (search.subtitle) params.set('subtitle', search.subtitle)
     if (search.theme) params.set('theme', search.theme)
     return `${window.location.origin}${window.location.pathname}?${params.toString()}`
   }, [isValid, search])
@@ -68,6 +71,18 @@ const LandingPage: React.FC = memo(() => {
               placeholder="e.g. Product launch"
               className={styles.input}
               maxLength={120}
+            />
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.label}>Subtitle (optional)</span>
+            <input
+              type="text"
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="e.g. Doors open at 7pm"
+              className={styles.input}
+              maxLength={160}
             />
           </label>
 

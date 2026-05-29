@@ -41,6 +41,23 @@
   justify-content: center;
 }
 
+.preview[data-variant='monolith'] .stage {
+  align-items: center;
+  justify-content: center;
+  gap: 8%;
+}
+
+.preview[data-variant='monolith'] .timer {
+  width: 92%;
+  height: 50%;
+  gap: 2%;
+}
+
+.preview[data-variant='monolith'] .timer > span {
+  background: color-mix(in oklab, var(--preview-fg), transparent 15%);
+  border-radius: 3px;
+}
+
 /* Frosted card backdrop for card variant */
 .preview[data-variant='card'] .card {
   position: absolute;
