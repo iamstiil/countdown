@@ -1,17 +1,24 @@
 import { useCountdownData } from '../data/CountdownDataContext'
-import type { SlotComponentProps } from '../theming/types'
+import type { SlotBehaviorMap, SlotComponentProps } from '../theming/types'
 
 const pad = (n: number) => n.toString().padStart(2, '0')
 
 type Unit = 'days' | 'hours' | 'minutes' | 'seconds'
 
 const FORMAT_UNITS: Record<
-  NonNullable<Required<{ format: 'dhms' | 'hms' | 'ms' }>['format']>,
+  NonNullable<NonNullable<SlotBehaviorMap['timer']>['format']>,
   Unit[]
 > = {
   dhms: ['days', 'hours', 'minutes', 'seconds'],
   hms: ['hours', 'minutes', 'seconds'],
   ms: ['minutes', 'seconds'],
+}
+
+const DEFAULT_LABELS: Record<Unit, string> = {
+  days: 'Days',
+  hours: 'Hours',
+  minutes: 'Minutes',
+  seconds: 'Seconds',
 }
 
 export function Timer({
@@ -23,8 +30,8 @@ export function Timer({
   const { remaining } = useCountdownData()
   const padZeros = props?.padZeros ?? true
 
-  // Single-unit mode: render just the numeric value (theme can place units
-  // freely around the layout tree).
+  // Single-unit mode: render just the numeric value — for themes that need to
+  // place each unit independently in the layout tree.
   if (props?.unit) {
     const raw = remaining[props.unit]
     return (
@@ -50,11 +57,20 @@ export function Timer({
       className={className}
       style={style}
     >
-      {units.map((unit) => (
-        <span key={unit} data-unit={unit}>
-          {padZeros && unit !== 'days' ? pad(remaining[unit]) : remaining[unit]}
-        </span>
-      ))}
+      {units.map((unit) => {
+        const raw = remaining[unit]
+        const display = padZeros && unit !== 'days' ? pad(raw) : String(raw)
+        return (
+          <div key={unit} data-unit-block={unit}>
+            <span data-value aria-label={`${raw} ${DEFAULT_LABELS[unit]}`}>
+              {display}
+            </span>
+            <span data-label aria-hidden="true">
+              {DEFAULT_LABELS[unit]}
+            </span>
+          </div>
+        )
+      })}
     </div>
   )
 }

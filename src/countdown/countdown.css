@@ -1,20 +1,167 @@
 /*
  * Countdown theming base styles.
  * Scoped under [data-ct-theme] so they cannot leak into the landing page.
+ *
+ * All visual decisions are driven by --ct-* tokens. Themes only need to
+ * declare token values; this stylesheet wires them to the slot DOM produced
+ * by the renderer.
  */
 
 [data-ct-theme] {
-  /* Sensible defaults; themes override via CSS variables. */
+  /* Portaled to <body>; cover the entire viewport unconditionally. */
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Mobile-safe dynamic viewport units where supported. */
+  height: 100dvh;
+  overflow: auto;
+  z-index: 50;
+
   color: var(--ct-color-fg, inherit);
   background-color: var(--ct-color-bg, transparent);
   font-family: var(--ct-font-display, inherit);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings:
+    'ss01' on,
+    'cv11' on;
 }
 
 [data-ct-theme] .ct-root {
+  position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
 }
 
+/* --- Event title -------------------------------------------------------- */
+
+[data-ct-theme] [data-slot='event-title'] {
+  margin: 0;
+  font-family: var(--ct-font-display, inherit);
+  font-size: var(--ct-size-title, 1rem);
+  font-weight: var(--ct-weight-title, 500);
+  letter-spacing: var(--ct-tracking-title, 0.24em);
+  text-transform: var(--ct-case-title, uppercase);
+  color: var(--ct-color-muted, currentColor);
+  line-height: 1.2;
+}
+
+/* --- Timer -------------------------------------------------------------- */
+
 [data-ct-theme] [data-slot='timer'] {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ct-timer-gap, 1.5rem);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on;
   text-shadow: var(--ct-text-shadow, none);
+}
+
+[data-ct-theme] [data-slot='timer'] [data-unit-block] {
+  display: flex;
+  flex-direction: column;
+  align-items: var(--ct-unit-align, center);
+  gap: var(--ct-unit-gap, 0.5rem);
+  min-width: var(--ct-unit-min-width, 0);
+}
+
+[data-ct-theme] [data-slot='timer'] [data-value] {
+  font-family: var(--ct-font-display, inherit);
+  font-size: var(--ct-size-timer, clamp(3rem, 12vw, 8rem));
+  font-weight: var(--ct-weight-timer, 600);
+  letter-spacing: var(--ct-tracking-timer, -0.04em);
+  line-height: 0.9;
+  color: var(--ct-color-accent, currentColor);
+  transition: color var(--ct-motion-fast, 200ms) ease;
+}
+
+[data-ct-theme] [data-slot='timer'] [data-label] {
+  font-family: var(--ct-font-label, var(--ct-font-display, inherit));
+  font-size: var(--ct-size-label, 0.75rem);
+  font-weight: var(--ct-weight-label, 500);
+  letter-spacing: var(--ct-tracking-label, 0.2em);
+  text-transform: var(--ct-case-label, uppercase);
+  color: var(--ct-color-muted, currentColor);
+}
+
+/* --- Separator ---------------------------------------------------------- */
+
+[data-ct-theme] [data-slot='timer-separator'] {
+  font-family: var(--ct-font-display, inherit);
+  font-size: var(--ct-size-timer, inherit);
+  font-weight: var(--ct-weight-timer, 600);
+  color: var(--ct-color-muted, currentColor);
+  opacity: 0.4;
+  line-height: 0.9;
+  user-select: none;
+}
+
+/* --- Progress: bar ------------------------------------------------------ */
+
+[data-ct-theme] [data-slot='progress'][data-kind='bar'] {
+  position: relative;
+  width: 100%;
+  height: var(--ct-progress-height, 3px);
+  background: color-mix(
+    in oklab,
+    var(--ct-color-muted, currentColor),
+    transparent 80%
+  );
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+[data-ct-theme] [data-slot='progress'][data-kind='bar'] > span {
+  display: block;
+  height: 100%;
+  background: var(--ct-color-accent, currentColor);
+  border-radius: inherit;
+  transition: width var(--ct-motion-slow, 800ms) cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: var(--ct-effect-progress-glow, none);
+}
+
+/* --- Progress: ring ----------------------------------------------------- */
+
+[data-ct-theme] [data-slot='progress'][data-kind='ring'] circle {
+  transition: stroke-dashoffset var(--ct-motion-slow, 800ms)
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Progress: segments ------------------------------------------------- */
+
+[data-ct-theme] [data-slot='progress'][data-kind='segments'] {
+  display: flex;
+  gap: var(--ct-segment-gap, 4px);
+  align-items: center;
+}
+
+[data-ct-theme] [data-slot='progress'][data-kind='segments'] > span {
+  flex: 1;
+  height: var(--ct-segment-height, 6px);
+  border-radius: 2px;
+  background: color-mix(
+    in oklab,
+    var(--ct-color-muted, currentColor),
+    transparent 75%
+  );
+  transition: background var(--ct-motion-fast, 200ms) ease;
+}
+
+[data-ct-theme]
+  [data-slot='progress'][data-kind='segments']
+  > span[data-on='true'] {
+  background: var(--ct-color-accent, currentColor);
+}
+
+/* --- Reduced motion ----------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ct-theme] *,
+  [data-ct-theme] *::before,
+  [data-ct-theme] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

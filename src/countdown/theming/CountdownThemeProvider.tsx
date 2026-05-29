@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { createPortal } from 'react-dom'
 
 import { buildTokenCSS } from './buildTokenCSS'
 import { SlotRenderer } from './Renderer'
@@ -11,6 +12,9 @@ export interface CountdownThemeProviderProps {
 /**
  * Roots a single countdown theme. Tokens are scoped to [data-ct-theme="id"]
  * so they cannot leak into the surrounding (landing page) design system.
+ *
+ * Rendered into document.body via portal so no ancestor layout/transform
+ * can constrain its full-viewport coverage.
  */
 export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
   const tokenCSS = useMemo(() => buildTokenCSS(theme), [theme])
@@ -19,11 +23,14 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
     [theme],
   )
 
-  return (
+  const tree = (
     <div data-ct-theme={theme.id} className="ct-root">
       <style>{tokenCSS}</style>
       {animationCSS && <style>{animationCSS}</style>}
       <SlotRenderer node={theme.layout} />
     </div>
   )
+
+  if (typeof document === 'undefined') return tree
+  return createPortal(tree, document.body)
 }

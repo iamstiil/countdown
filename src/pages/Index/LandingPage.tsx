@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import React, { memo, useMemo, useState } from 'react'
 
-
 import { DEFAULT_THEME_ID, themeList } from '../../countdown'
 import type { ThemeId } from '../../countdown'
 
@@ -50,73 +49,98 @@ const LandingPage: React.FC = memo(() => {
 
   return (
     <div className={styles.wrapper}>
-      <h1 className={styles.title}>Create a countdown</h1>
-      <p className={styles.lead}>
-        Pick a date and an optional title, then share the link.
-      </p>
+      <div className={styles.card}>
+        <header className={styles.header}>
+          <span className={styles.eyebrow}>New countdown</span>
+          <h1 className={styles.title}>Create a countdown</h1>
+          <p className={styles.lead}>
+            Set a date, pick a theme, and share the link with anyone.
+          </p>
+        </header>
 
-      <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
-        <label className={styles.field}>
-          <span className={styles.label}>Title (optional)</span>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="New Year"
-            className={styles.input}
-            maxLength={120}
-          />
-        </label>
+        <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+          <label className={styles.field}>
+            <span className={styles.label}>Title (optional)</span>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Product launch"
+              className={styles.input}
+              maxLength={120}
+            />
+          </label>
 
-        <label className={styles.field}>
-          <span className={styles.label}>Target date &amp; time</span>
-          <input
-            type="datetime-local"
-            value={localDate}
-            onChange={(e) => setLocalDate(e.target.value)}
-            className={styles.input}
-            required
-          />
-        </label>
+          <label className={styles.field}>
+            <span className={styles.label}>Target date &amp; time</span>
+            <input
+              type="datetime-local"
+              value={localDate}
+              onChange={(e) => setLocalDate(e.target.value)}
+              className={styles.input}
+              required
+            />
+          </label>
 
-        <label className={styles.field}>
-          <span className={styles.label}>Theme</span>
-          <select
-            value={theme}
-            onChange={(e) => setTheme(e.target.value as ThemeId)}
-            className={styles.input}
-          >
-            {themeList.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
+          <div className={styles.field}>
+            <span className={styles.label}>Theme</span>
+            <div
+              className={styles.themeGrid}
+              role="radiogroup"
+              aria-label="Countdown theme"
+            >
+              {themeList.map((t) => {
+                const selected = t.id === theme
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    aria-pressed={selected}
+                    onClick={() => setTheme(t.id)}
+                    className={styles.themeOption}
+                  >
+                    <span
+                      className={styles.themeSwatch}
+                      style={
+                        {
+                          '--swatch': t.swatch,
+                        } as React.CSSProperties
+                      }
+                      aria-hidden="true"
+                    />
+                    <span className={styles.themeName}>{t.name}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
 
-        {target && !isValid && (
-          <p className={styles.error}>Please pick a date in the future.</p>
+          {target && !isValid && (
+            <p className={styles.error}>Please pick a date in the future.</p>
+          )}
+        </form>
+
+        {isValid && search && (
+          <div className={styles.actions}>
+            <Link to="/" search={search} className={styles.primary}>
+              Start countdown
+            </Link>
+            <button
+              type="button"
+              className={styles.secondary}
+              onClick={() => {
+                if (shareUrl) void navigator.clipboard?.writeText(shareUrl)
+              }}
+            >
+              Copy share link
+            </button>
+          </div>
         )}
-      </form>
 
-      {isValid && search && (
-        <div className={styles.actions}>
-          <Link to="/" search={search} className={styles.primary}>
-            Start countdown
-          </Link>
-          <button
-            type="button"
-            className={styles.secondary}
-            onClick={() => {
-              if (shareUrl) void navigator.clipboard?.writeText(shareUrl)
-            }}
-          >
-            Copy share link
-          </button>
-        </div>
-      )}
-
-      {isValid && shareUrl && <code className={styles.url}>{shareUrl}</code>}
+        {isValid && shareUrl && <code className={styles.url}>{shareUrl}</code>}
+      </div>
     </div>
   )
 })
