@@ -8,6 +8,9 @@ export type {
   SlotNode,
   SlotType,
   SlotTrigger,
+  SoundDecl,
+  AudioBinding,
+  HapticPattern,
 } from './theming/types'
 export {
   useCountdownData,
@@ -15,6 +18,11 @@ export {
   useContinuousProgress,
   useThemeEffect,
 } from './data/CountdownDataContext'
+export {
+  isAudioEnabled,
+  setAudioEnabled,
+  subscribeAudioEnabled,
+} from './data/audioPreference'
 export type {
   CountdownEventName,
   CountdownEventListener,

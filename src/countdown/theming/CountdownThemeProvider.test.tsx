@@ -6,7 +6,6 @@ import { CountdownDataProvider } from '../data/CountdownDataContext'
 import { CountdownThemeProvider } from './CountdownThemeProvider'
 import type { CountdownTheme } from './types'
 
-
 const minimalTheme = (
   overrides: Partial<CountdownTheme> = {},
 ): CountdownTheme => ({

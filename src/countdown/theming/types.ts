@@ -169,6 +169,39 @@ export type PartialTokens = Partial<{
  */
 export type CountdownState = 'counting' | 'final-minute' | 'done' | 'idle'
 
+/**
+ * Declaration of a single audio sample. Buffer is preloaded by the audio
+ * engine once the user has interacted (browsers gate AudioContext on a
+ * user gesture).
+ */
+export interface SoundDecl {
+  /** URL of a short audio file (mp3/ogg/wav). Kept short — these are SFX. */
+  src: string
+  /** 0..1 linear gain. Default 1. */
+  volume?: number
+  /**
+   * Max simultaneous voices for the sound. Default 4. Additional plays
+   * within the polyphony window are dropped.
+   */
+  polyphony?: number
+}
+
+/**
+ * Binding from a bus event to a declared sound. Optional `throttleMs`
+ * suppresses repeated plays within the window (e.g. avoid machine-gunning
+ * a coin clack during a fast tick burst).
+ */
+export interface AudioBinding {
+  sound: string
+  throttleMs?: number
+}
+
+/**
+ * Vibration pattern, passed straight to `navigator.vibrate`. A single
+ * number is a one-shot ms duration; an array alternates vibrate/pause.
+ */
+export type HapticPattern = number | number[]
+
 export interface CountdownTheme {
   id: string
   name: string
@@ -194,6 +227,27 @@ export interface CountdownTheme {
    * to the `idle` state. Omit to disable idle entirely.
    */
   idleAfterMs?: number
+  /**
+   * Named SFX bank. Preloaded by the audio engine on first user gesture.
+   * Keys are free-form theme-local identifiers referenced by `audio`.
+   */
+  sounds?: Record<string, SoundDecl>
+  /**
+   * Bus-event-to-sound bindings. The audio engine plays each binding's
+   * sample on emission (respecting throttling, mute, and reduced-motion).
+   */
+  audio?: Partial<Record<CountdownEventName, AudioBinding>>
+  /**
+   * Bus-event-to-vibration bindings. No-op on devices/browsers without
+   * `navigator.vibrate`.
+   */
+  haptics?: Partial<Record<CountdownEventName, HapticPattern>>
+  /**
+   * When true (default false), the theme opts OUT of the reduced-motion
+   * audio suppression — useful for themes where audio is informational
+   * (e.g. final-minute warning) rather than decorative.
+   */
+  audioIgnoresReducedMotion?: boolean
   /** Optional keyframes/animation rules injected as a <style> block. */
   animations?: Record<string, string>
 }

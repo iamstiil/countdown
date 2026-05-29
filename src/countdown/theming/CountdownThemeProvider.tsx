@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import { isAudioEnabled, subscribeAudioEnabled } from '../data/audioPreference'
 import {
   useContinuousProgress,
   useCountdownData,
+  useCountdownEvents,
 } from '../data/CountdownDataContext'
+import type { CountdownEventName } from '../data/events'
 
+import { createAudioEngine } from './audioEngine'
 import { buildTokenCSS } from './buildTokenCSS'
+import { vibrate } from './haptics'
 import { SlotRenderer } from './Renderer'
 import type { CountdownState, CountdownTheme, SlotNode } from './types'
 
@@ -86,6 +91,82 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
       }
     }
   }, [idleAfterMs])
+
+  // --- Audio + haptics -------------------------------------------------
+  // We track audio-enabled in a ref so the engine's closure sees the
+  // current value without recreating the engine on every toggle.
+  const { subscribe: subscribeBus } = useCountdownEvents()
+  const audioEnabledRef = useRef<boolean>(true)
+
+  useEffect(() => {
+    audioEnabledRef.current = isAudioEnabled()
+    return subscribeAudioEnabled((on) => {
+      audioEnabledRef.current = on
+    })
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!theme.audio && !theme.sounds && !theme.haptics) return
+
+    const reducedMotion = () =>
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    const ignore = theme.audioIgnoresReducedMotion ?? false
+
+    const engine = createAudioEngine({
+      enabled: () => audioEnabledRef.current,
+      reducedMotion,
+      audioIgnoresReducedMotion: ignore,
+    })
+
+    if (theme.sounds) {
+      void engine.preload(theme.sounds)
+    }
+
+    const unsubs: Array<() => void> = []
+    const audioMap = theme.audio
+    if (audioMap) {
+      for (const [event, binding] of Object.entries(audioMap) as Array<
+        [CountdownEventName, NonNullable<typeof audioMap>[CountdownEventName]]
+      >) {
+        if (!binding) continue
+        unsubs.push(
+          subscribeBus(event, () => {
+            engine.playBinding(event, binding)
+          }),
+        )
+      }
+    }
+
+    const hapticsMap = theme.haptics
+    if (hapticsMap) {
+      for (const [event, pattern] of Object.entries(hapticsMap) as Array<
+        [CountdownEventName, NonNullable<typeof hapticsMap>[CountdownEventName]]
+      >) {
+        if (pattern === undefined) continue
+        unsubs.push(
+          subscribeBus(event, () => {
+            vibrate(pattern, {
+              enabled: () => audioEnabledRef.current,
+              reducedMotion,
+              ignoreReducedMotion: ignore,
+            })
+          }),
+        )
+      }
+    }
+
+    return () => {
+      for (const off of unsubs) off()
+      engine.dispose()
+    }
+  }, [
+    theme.audio,
+    theme.haptics,
+    theme.sounds,
+    theme.audioIgnoresReducedMotion,
+    subscribeBus,
+  ])
 
   // --- Resolve effective state and layout ------------------------------
   const state: CountdownState =
