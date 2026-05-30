@@ -31,6 +31,12 @@ export {
 } from './theming/filterLibrary'
 export { resolveAssetUrl, normalizeAsset } from './theming/assets'
 export { useThemeAssets } from './theming/ThemeAssetsContext'
+export { useReducedMotion } from './theming/useReducedMotion'
+export {
+  renderTheme,
+  targetForState,
+  findThemeRoot,
+} from './theming/testHarness'
 export {
   isAudioEnabled,
   setAudioEnabled,

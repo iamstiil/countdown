@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { resolveAssetUrl } from '../theming/assets'
 import { useThemeAssets } from '../theming/ThemeAssetsContext'
 import type { SlotComponentProps } from '../theming/types'
+import { useReducedMotion } from '../theming/useReducedMotion'
 import { useSlotTrigger } from '../theming/useSlotTrigger'
 
 /**
@@ -25,6 +26,7 @@ export function Sprite({
   const mountedRef = useRef(false)
   const playOn = props?.playOn ?? 'mount'
   const assets = useThemeAssets()
+  const reducedMotion = useReducedMotion()
 
   useSlotTrigger(playOn, () => {
     // Skip the implicit first-mount fire — initial render already shows gen=0.
@@ -67,6 +69,7 @@ export function Sprite({
       <div
         key={gen}
         data-sprite-frame
+        data-reduced-motion={reducedMotion ? 'true' : undefined}
         style={
           {
             width: `${frameWidth}px`,
@@ -75,13 +78,22 @@ export function Sprite({
             backgroundRepeat: 'no-repeat',
             backgroundSize: `${stripWidth}px ${frameHeight}px`,
             imageRendering: pixelated ? 'pixelated' : undefined,
-            animationName: 'ct-sprite-strip',
-            animationDuration: `${durationMs}ms`,
-            animationTimingFunction: `steps(${frames}, end)`,
-            animationIterationCount: loop || playOn === 'loop' ? 'infinite' : 1,
-            animationFillMode: 'forwards',
-            // Shared @keyframes in countdown.css uses this var as the end translation.
-            '--ct-sprite-strip-end': `${-stripWidth}px`,
+            // Reduced motion: pin the sprite to its first frame and skip
+            // the strip animation entirely. Themes can override the
+            // representative frame via --ct-sprite-static-x.
+            ...(reducedMotion
+              ? {
+                  backgroundPositionX: 'var(--ct-sprite-static-x, 0px)',
+                }
+              : {
+                  animationName: 'ct-sprite-strip',
+                  animationDuration: `${durationMs}ms`,
+                  animationTimingFunction: `steps(${frames}, end)`,
+                  animationIterationCount:
+                    loop || playOn === 'loop' ? 'infinite' : 1,
+                  animationFillMode: 'forwards',
+                  '--ct-sprite-strip-end': `${-stripWidth}px`,
+                }),
           } as React.CSSProperties
         }
       />

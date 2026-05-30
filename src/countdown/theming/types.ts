@@ -288,6 +288,28 @@ export interface CountdownTheme {
    */
   audioIgnoresReducedMotion?: boolean
   /**
+   * Targeted overrides applied when the user has
+   * `prefers-reduced-motion: reduce` active. Each field replaces the
+   * corresponding top-level field; omit a field to inherit. Unlike the
+   * blunt "kill all animations" approach, this lets themes ship a
+   * deliberate reduced-motion variant (e.g. a quieter layout, a small
+   * subset of audio cues, no haptics).
+   *
+   * When `reducedMotion.layout` is provided it overrides the default
+   * `layout` (and is itself overridable by per-state `finalLayout` /
+   * `doneLayout` / `idleLayout`).
+   */
+  reducedMotion?: {
+    /** Replaces `theme.animations` wholesale when set. */
+    animations?: Record<string, string>
+    /** Replaces `theme.layout` wholesale when set. */
+    layout?: SlotNode<'group'>
+    /** Replaces `theme.audio` wholesale when set (use `{}` to silence). */
+    audio?: Partial<Record<CountdownEventName, AudioBinding>>
+    /** Replaces `theme.haptics` wholesale when set (use `{}` to silence). */
+    haptics?: Partial<Record<CountdownEventName, HapticPattern>>
+  }
+  /**
    * Opt into device-orientation parallax. When true, the provider
    * requests permission on iOS (gesture-gated) and writes
    * `--ct-tilt-x` and `--ct-tilt-y` (normalized −1..1) on the theme

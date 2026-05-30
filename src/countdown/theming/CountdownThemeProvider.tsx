@@ -18,6 +18,7 @@ import { vibrate } from './haptics'
 import { SlotRenderer } from './Renderer'
 import { ThemeAssetsContext } from './ThemeAssetsContext'
 import type { CountdownState, CountdownTheme, SlotNode } from './types'
+import { useReducedMotion } from './useReducedMotion'
 
 export interface CountdownThemeProviderProps {
   theme: CountdownTheme
@@ -43,10 +44,33 @@ const clamp = (n: number, min: number, max: number) =>
  * can constrain its full-viewport coverage.
  */
 export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
+  const reducedMotion = useReducedMotion()
+
+  // Reduced-motion overrides replace top-level fields wholesale (see
+  // CountdownTheme.reducedMotion). Per-state alternate layouts still
+  // win over the reduced-motion base layout below.
+  const effectiveAnimations =
+    reducedMotion && theme.reducedMotion?.animations !== undefined
+      ? theme.reducedMotion.animations
+      : theme.animations
+  const effectiveAudio =
+    reducedMotion && theme.reducedMotion?.audio !== undefined
+      ? theme.reducedMotion.audio
+      : theme.audio
+  const effectiveHaptics =
+    reducedMotion && theme.reducedMotion?.haptics !== undefined
+      ? theme.reducedMotion.haptics
+      : theme.haptics
+  const baseLayout =
+    reducedMotion && theme.reducedMotion?.layout !== undefined
+      ? theme.reducedMotion.layout
+      : theme.layout
+
   const tokenCSS = useMemo(() => buildTokenCSS(theme), [theme])
   const animationCSS = useMemo(
-    () => (theme.animations ? Object.values(theme.animations).join('\n') : ''),
-    [theme],
+    () =>
+      effectiveAnimations ? Object.values(effectiveAnimations).join('\n') : '',
+    [effectiveAnimations],
   )
   const defsMarkup = useMemo(
     () =>
@@ -258,7 +282,7 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (!theme.audio && !theme.sounds && !theme.haptics) return
+    if (!effectiveAudio && !theme.sounds && !effectiveHaptics) return
 
     const reducedMotion = () =>
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
@@ -284,7 +308,7 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
     }
 
     const unsubs: Array<() => void> = []
-    const audioMap = theme.audio
+    const audioMap = effectiveAudio
     if (audioMap) {
       for (const [event, binding] of Object.entries(audioMap) as Array<
         [CountdownEventName, NonNullable<typeof audioMap>[CountdownEventName]]
@@ -298,7 +322,7 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
       }
     }
 
-    const hapticsMap = theme.haptics
+    const hapticsMap = effectiveHaptics
     if (hapticsMap) {
       for (const [event, pattern] of Object.entries(hapticsMap) as Array<
         [CountdownEventName, NonNullable<typeof hapticsMap>[CountdownEventName]]
@@ -321,8 +345,8 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
       engine.dispose()
     }
   }, [
-    theme.audio,
-    theme.haptics,
+    effectiveAudio,
+    effectiveHaptics,
     theme.sounds,
     theme.assets,
     theme.audioIgnoresReducedMotion,
@@ -333,7 +357,7 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
   const state: CountdownState =
     lifecycleState === 'done' ? 'done' : isIdle ? 'idle' : lifecycleState // 'counting' | 'final-minute'
 
-  const activeLayout = pickLayout(theme, state)
+  const activeLayout = pickLayout(theme, state, baseLayout)
 
   // --- Crossfade between layouts ---------------------------------------
   // When the layout reference changes we render the outgoing tree alongside
@@ -369,6 +393,7 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
         data-ct-theme={theme.id}
         data-state={state}
         data-fonts-ready={fontsReady ? 'true' : 'false'}
+        data-reduced-motion={reducedMotion ? 'true' : 'false'}
         className="ct-root"
       >
         <style>{tokenCSS}</style>
@@ -410,17 +435,18 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
 function pickLayout(
   theme: CountdownTheme,
   state: CountdownState,
+  baseLayout: SlotNode<'group'>,
 ): SlotNode<'group'> {
   switch (state) {
     case 'done':
-      return theme.doneLayout ?? theme.layout
+      return theme.doneLayout ?? baseLayout
     case 'final-minute':
-      return theme.finalLayout ?? theme.layout
+      return theme.finalLayout ?? baseLayout
     case 'idle':
-      return theme.idleLayout ?? theme.layout
+      return theme.idleLayout ?? baseLayout
     case 'counting':
     default:
-      return theme.layout
+      return baseLayout
   }
 }
 
