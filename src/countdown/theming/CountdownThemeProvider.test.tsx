@@ -130,3 +130,52 @@ describe('CountdownThemeProvider — alternate layouts', () => {
     expect(findRoot()!.querySelector('.done-marker')).not.toBeNull()
   })
 })
+
+describe('CountdownThemeProvider — defs injection', () => {
+  it('does not inject a defs <svg> when theme.defs is absent', () => {
+    const target = new Date(Date.now() + 60_000)
+    render(
+      <CountdownDataProvider targetDate={target} title="T">
+        <CountdownThemeProvider theme={minimalTheme()} />
+      </CountdownDataProvider>,
+    )
+    expect(findRoot()!.querySelector('svg[data-ct-defs]')).toBeNull()
+  })
+
+  it('injects built-in filter ids when requested', () => {
+    const target = new Date(Date.now() + 60_000)
+    render(
+      <CountdownDataProvider targetDate={target} title="T">
+        <CountdownThemeProvider
+          theme={minimalTheme({
+            defs: { filters: ['ink-bleed', 'crt-warp'] },
+          })}
+        />
+      </CountdownDataProvider>,
+    )
+    const svg = findRoot()!.querySelector('svg[data-ct-defs]')!
+    expect(svg).not.toBeNull()
+    expect(svg.getAttribute('aria-hidden')).toBe('true')
+    expect(svg.querySelector('#ct-ink-bleed')).not.toBeNull()
+    expect(svg.querySelector('#ct-crt-warp')).not.toBeNull()
+  })
+
+  it('appends raw markup alongside built-ins', () => {
+    const target = new Date(Date.now() + 60_000)
+    render(
+      <CountdownDataProvider targetDate={target} title="T">
+        <CountdownThemeProvider
+          theme={minimalTheme({
+            defs: {
+              filters: ['ink-bleed'],
+              raw: '<mask id="ct-test-mask"><rect width="100" height="100" fill="white" /></mask>',
+            },
+          })}
+        />
+      </CountdownDataProvider>,
+    )
+    const svg = findRoot()!.querySelector('svg[data-ct-defs]')!
+    expect(svg.querySelector('#ct-ink-bleed')).not.toBeNull()
+    expect(svg.querySelector('#ct-test-mask')).not.toBeNull()
+  })
+})

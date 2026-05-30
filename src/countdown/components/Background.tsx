@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+
 import type { SlotComponentProps } from '../theming/types'
 
 export function Background({
@@ -7,6 +9,11 @@ export function Background({
   props,
 }: SlotComponentProps<'background'>) {
   const kind = props?.kind ?? 'gradient'
+  // CSS doesn't yet auto-prefix mask in every engine we care about, so we
+  // set both `mask` and `WebkitMask` when the theme opts in.
+  const maskStyle: CSSProperties | undefined = props?.mask
+    ? { maskImage: props.mask, WebkitMaskImage: props.mask }
+    : undefined
 
   if (kind === 'image' && props?.src) {
     return (
@@ -19,6 +26,7 @@ export function Background({
           backgroundImage: `url(${props.src})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          ...maskStyle,
           ...style,
         }}
         aria-hidden="true"
@@ -33,7 +41,7 @@ export function Background({
         data-slot-id={id}
         data-kind="video"
         className={className}
-        style={style}
+        style={{ ...maskStyle, ...style }}
         src={props.src}
         autoPlay
         muted
@@ -51,7 +59,7 @@ export function Background({
       data-slot-id={id}
       data-kind={kind}
       className={className}
-      style={style}
+      style={{ ...maskStyle, ...style }}
       aria-hidden="true"
     />
   )

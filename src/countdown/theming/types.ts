@@ -2,6 +2,8 @@ import type { ComponentType, CSSProperties, ReactNode } from 'react'
 
 import type { CountdownEventName } from '../data/events'
 
+import type { BuiltInFilterId } from './filterLibrary'
+
 export type Breakpoint = 'base' | 'sm' | 'md' | 'lg' | 'xl'
 
 export type SlotType =
@@ -69,6 +71,14 @@ export interface SlotBehaviorMap {
     kind?: 'image' | 'video' | 'gradient' | 'canvas'
     src?: string
     loop?: boolean
+    /**
+     * Optional SVG mask reference applied as `mask-image` (and
+     * `-webkit-mask-image`). Pair with a `<mask id="…">` declared via
+     * `theme.defs.raw` to clip non-rectangular reveals (e.g. a curved
+     * CRT glass shape). Accepts any `mask-image` value, but the typical
+     * form is `url(#id)`.
+     */
+    mask?: string
   }
   group: Record<string, never>
   sprite: {
@@ -284,6 +294,21 @@ export interface CountdownTheme {
    * root at rAF rate. No-ops on devices without DeviceOrientation.
    */
   tilt?: boolean
+  /**
+   * SVG defs (filters, masks, gradients, symbols) injected once into a
+   * hidden inert `<svg>` rooted in the theme container. Themes apply
+   * them via CSS variables, e.g.
+   *
+   *     vars: { '--ct-filter-ink': 'url(#ct-ink-bleed)' }
+   *
+   * `filters` lists built-in filter ids from `filterLibrary`; `raw`
+   * concatenates arbitrary SVG markup for custom defs. Both are
+   * optional and either may be used alone.
+   */
+  defs?: {
+    filters?: ReadonlyArray<BuiltInFilterId>
+    raw?: string
+  }
   /** Optional keyframes/animation rules injected as a <style> block. */
   animations?: Record<string, string>
 }

@@ -23,6 +23,11 @@ export {
 } from './data/CountdownDataContext'
 export type { ActionBus, ActionListener } from './data/actions'
 export {
+  builtInFilters,
+  buildDefsMarkup,
+  type BuiltInFilterId,
+} from './theming/filterLibrary'
+export {
   isAudioEnabled,
   setAudioEnabled,
   subscribeAudioEnabled,

@@ -11,6 +11,7 @@ import type { CountdownEventName } from '../data/events'
 
 import { createAudioEngine } from './audioEngine'
 import { buildTokenCSS } from './buildTokenCSS'
+import { buildDefsMarkup } from './filterLibrary'
 import { vibrate } from './haptics'
 import { SlotRenderer } from './Renderer'
 import type { CountdownState, CountdownTheme, SlotNode } from './types'
@@ -42,6 +43,11 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
   const tokenCSS = useMemo(() => buildTokenCSS(theme), [theme])
   const animationCSS = useMemo(
     () => (theme.animations ? Object.values(theme.animations).join('\n') : ''),
+    [theme],
+  )
+  const defsMarkup = useMemo(
+    () =>
+      theme.defs ? buildDefsMarkup(theme.defs.filters, theme.defs.raw) : '',
     [theme],
   )
 
@@ -305,6 +311,23 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
     >
       <style>{tokenCSS}</style>
       {animationCSS && <style>{animationCSS}</style>}
+      {defsMarkup && (
+        <svg
+          data-ct-defs
+          aria-hidden="true"
+          focusable="false"
+          width="0"
+          height="0"
+          style={{
+            position: 'absolute',
+            width: 0,
+            height: 0,
+            overflow: 'hidden',
+          }}
+        >
+          <defs dangerouslySetInnerHTML={{ __html: defsMarkup }} />
+        </svg>
+      )}
       {layers.map((layer, idx) => (
         <div
           key={layer.key}
