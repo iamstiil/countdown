@@ -9,11 +9,14 @@ import {
 } from '../data/CountdownDataContext'
 import type { CountdownEventName } from '../data/events'
 
+import { normalizeAsset, resolveAssetUrl } from './assets'
 import { createAudioEngine } from './audioEngine'
 import { buildTokenCSS } from './buildTokenCSS'
 import { buildDefsMarkup } from './filterLibrary'
+import { loadFonts, waitForFonts } from './fontLoader'
 import { vibrate } from './haptics'
 import { SlotRenderer } from './Renderer'
+import { ThemeAssetsContext } from './ThemeAssetsContext'
 import type { CountdownState, CountdownTheme, SlotNode } from './types'
 
 export interface CountdownThemeProviderProps {
@@ -100,6 +103,53 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
       }
     }
   }, [idleAfterMs])
+
+  // --- Fonts -----------------------------------------------------------
+  // Inject <link> tags for declared families and flip
+  // data-fonts-ready="true" once they're loaded. Themes can key text
+  // styling on that attribute for a one-shot FOUT-free reveal.
+  const [fontsReady, setFontsReady] = useState(
+    !theme.fonts || theme.fonts.length === 0,
+  )
+  const themeFonts = theme.fonts
+  useEffect(() => {
+    if (!themeFonts || themeFonts.length === 0) {
+      setFontsReady(true)
+      return
+    }
+    setFontsReady(false)
+    const dispose = loadFonts(themeFonts)
+    let cancelled = false
+    waitForFonts(themeFonts).then(() => {
+      if (!cancelled) setFontsReady(true)
+    })
+    return () => {
+      cancelled = true
+      dispose()
+    }
+  }, [themeFonts])
+
+  // --- Asset preload hints --------------------------------------------
+  // Emit <link rel="preload"> for assets opting in via `preload: true`.
+  const themeAssets = theme.assets
+  useEffect(() => {
+    if (!themeAssets || typeof document === 'undefined') return
+    const tags: HTMLLinkElement[] = []
+    for (const decl of Object.values(themeAssets)) {
+      const a = normalizeAsset(decl)
+      if (!a || !a.preload) continue
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.href = a.url
+      if (a.as) link.as = a.as
+      if (a.crossOrigin) link.crossOrigin = a.crossOrigin
+      document.head.appendChild(link)
+      tags.push(link)
+    }
+    return () => {
+      for (const t of tags) t.remove()
+    }
+  }, [themeAssets])
 
   // --- Tilt parallax ---------------------------------------------------
   // Writes --ct-tilt-x and --ct-tilt-y (normalized -1..1) on the theme
@@ -221,7 +271,16 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
     })
 
     if (theme.sounds) {
-      void engine.preload(theme.sounds)
+      // Resolve `asset:KEY` URIs in sound declarations against the
+      // theme's asset manifest before handing to the audio engine.
+      const resolvedSounds: Record<string, (typeof theme.sounds)[string]> = {}
+      for (const [name, decl] of Object.entries(theme.sounds)) {
+        resolvedSounds[name] = {
+          ...decl,
+          src: resolveAssetUrl(decl.src, theme.assets) ?? decl.src,
+        }
+      }
+      void engine.preload(resolvedSounds)
     }
 
     const unsubs: Array<() => void> = []
@@ -265,6 +324,7 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
     theme.audio,
     theme.haptics,
     theme.sounds,
+    theme.assets,
     theme.audioIgnoresReducedMotion,
     subscribeBus,
   ])
@@ -303,41 +363,44 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
   }, [activeLayout])
 
   const tree = (
-    <div
-      ref={rootRef}
-      data-ct-theme={theme.id}
-      data-state={state}
-      className="ct-root"
-    >
-      <style>{tokenCSS}</style>
-      {animationCSS && <style>{animationCSS}</style>}
-      {defsMarkup && (
-        <svg
-          data-ct-defs
-          aria-hidden="true"
-          focusable="false"
-          width="0"
-          height="0"
-          style={{
-            position: 'absolute',
-            width: 0,
-            height: 0,
-            overflow: 'hidden',
-          }}
-        >
-          <defs dangerouslySetInnerHTML={{ __html: defsMarkup }} />
-        </svg>
-      )}
-      {layers.map((layer, idx) => (
-        <div
-          key={layer.key}
-          className="ct-layer"
-          data-layer-phase={idx === layers.length - 1 ? 'enter' : 'exit'}
-        >
-          <SlotRenderer node={layer.node} />
-        </div>
-      ))}
-    </div>
+    <ThemeAssetsContext.Provider value={theme.assets ?? null}>
+      <div
+        ref={rootRef}
+        data-ct-theme={theme.id}
+        data-state={state}
+        data-fonts-ready={fontsReady ? 'true' : 'false'}
+        className="ct-root"
+      >
+        <style>{tokenCSS}</style>
+        {animationCSS && <style>{animationCSS}</style>}
+        {defsMarkup && (
+          <svg
+            data-ct-defs
+            aria-hidden="true"
+            focusable="false"
+            width="0"
+            height="0"
+            style={{
+              position: 'absolute',
+              width: 0,
+              height: 0,
+              overflow: 'hidden',
+            }}
+          >
+            <defs dangerouslySetInnerHTML={{ __html: defsMarkup }} />
+          </svg>
+        )}
+        {layers.map((layer, idx) => (
+          <div
+            key={layer.key}
+            className="ct-layer"
+            data-layer-phase={idx === layers.length - 1 ? 'enter' : 'exit'}
+          >
+            <SlotRenderer node={layer.node} />
+          </div>
+        ))}
+      </div>
+    </ThemeAssetsContext.Provider>
   )
 
   if (typeof document === 'undefined') return tree

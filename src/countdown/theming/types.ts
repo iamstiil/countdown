@@ -295,6 +295,23 @@ export interface CountdownTheme {
    */
   tilt?: boolean
   /**
+   * Declared web fonts. The provider injects `<link>` tags into
+   * `<head>` (with `font-display: swap` semantics via Google's
+   * `&display=swap` query), then waits on `document.fonts.ready` and
+   * stamps `data-fonts-ready="true"` on the theme root once every
+   * declared family has loaded. Themes that key text styling on
+   * `[data-fonts-ready="true"]` get a one-shot FOUT-free reveal.
+   */
+  fonts?: ReadonlyArray<FontDecl>
+  /**
+   * Named asset URLs. Themes reference assets by key from sprite/audio
+   * slots using the `asset:<key>` URI scheme, decoupling the theme
+   * declaration from the eventual hashed bundle URL. The provider also
+   * emits `<link rel="preload">` hints for asset URLs likely to be used
+   * above the fold.
+   */
+  assets?: Record<string, AssetDecl>
+  /**
    * SVG defs (filters, masks, gradients, symbols) injected once into a
    * hidden inert `<svg>` rooted in the theme container. Themes apply
    * them via CSS variables, e.g.
@@ -312,6 +329,36 @@ export interface CountdownTheme {
   /** Optional keyframes/animation rules injected as a <style> block. */
   animations?: Record<string, string>
 }
+
+/**
+ * A declared web font. `source: 'google'` builds a Google Fonts CSS2
+ * URL with `&display=swap`; `source: 'self'` injects a stylesheet
+ * `href` you ship yourself (you're responsible for the `@font-face`
+ * rules inside it).
+ */
+export interface FontDecl {
+  family: string
+  weights?: ReadonlyArray<number>
+  source: 'google' | 'self'
+  /** Required when `source === 'self'`. Ignored for `'google'`. */
+  href?: string
+}
+
+/**
+ * A named asset. A bare `string` is shorthand for `{ url, preload: false }`.
+ * Setting `preload: true` makes the provider emit a `<link rel="preload">`
+ * hint when the theme mounts.
+ */
+export type AssetDecl =
+  | string
+  | {
+      url: string
+      /** `image` and `audio` cover the only kinds we currently consume. */
+      as?: 'image' | 'audio' | 'fetch'
+      preload?: boolean
+      /** Required for `as: 'fetch'` cross-origin preloads. */
+      crossOrigin?: 'anonymous' | 'use-credentials'
+    }
 
 export interface SlotComponentProps<K extends SlotType = SlotType> {
   id: string

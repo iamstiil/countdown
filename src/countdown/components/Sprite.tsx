@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 
+import { resolveAssetUrl } from '../theming/assets'
+import { useThemeAssets } from '../theming/ThemeAssetsContext'
 import type { SlotComponentProps } from '../theming/types'
 import { useSlotTrigger } from '../theming/useSlotTrigger'
 
@@ -22,6 +24,7 @@ export function Sprite({
   const [gen, setGen] = useState(0)
   const mountedRef = useRef(false)
   const playOn = props?.playOn ?? 'mount'
+  const assets = useThemeAssets()
 
   useSlotTrigger(playOn, () => {
     // Skip the implicit first-mount fire — initial render already shows gen=0.
@@ -43,6 +46,7 @@ export function Sprite({
     pixelated = false,
     label,
   } = props
+  const resolvedSrc = resolveAssetUrl(src, assets ?? undefined)
 
   const durationMs = (frames / Math.max(1, fps)) * 1000
   const stripWidth = frameWidth * frames
@@ -67,7 +71,7 @@ export function Sprite({
           {
             width: `${frameWidth}px`,
             height: `${frameHeight}px`,
-            backgroundImage: `url(${src})`,
+            backgroundImage: `url(${resolvedSrc})`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: `${stripWidth}px ${frameHeight}px`,
             imageRendering: pixelated ? 'pixelated' : undefined,

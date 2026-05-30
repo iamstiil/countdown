@@ -179,3 +179,58 @@ describe('CountdownThemeProvider — defs injection', () => {
     expect(svg.querySelector('#ct-test-mask')).not.toBeNull()
   })
 })
+
+describe('CountdownThemeProvider — fonts and assets', () => {
+  it('stamps data-fonts-ready="true" immediately when no fonts declared', () => {
+    const target = new Date(Date.now() + 60_000)
+    render(
+      <CountdownDataProvider targetDate={target} title="T">
+        <CountdownThemeProvider theme={minimalTheme()} />
+      </CountdownDataProvider>,
+    )
+    expect(findRoot()!.getAttribute('data-fonts-ready')).toBe('true')
+  })
+
+  it('injects google font <link> tags into <head>', () => {
+    const target = new Date(Date.now() + 60_000)
+    render(
+      <CountdownDataProvider targetDate={target} title="T">
+        <CountdownThemeProvider
+          theme={minimalTheme({
+            fonts: [{ family: 'Inter', source: 'google', weights: [400] }],
+          })}
+        />
+      </CountdownDataProvider>,
+    )
+    const sheets = document.head.querySelectorAll(
+      'link[rel="stylesheet"][href*="fonts.googleapis.com"][href*="Inter"]',
+    )
+    expect(sheets.length).toBeGreaterThan(0)
+    const preconnect = document.head.querySelector(
+      'link[rel="preconnect"][href="https://fonts.googleapis.com"]',
+    )
+    expect(preconnect).not.toBeNull()
+  })
+
+  it('emits preload hints only for assets with preload: true', () => {
+    const target = new Date(Date.now() + 60_000)
+    render(
+      <CountdownDataProvider targetDate={target} title="T">
+        <CountdownThemeProvider
+          theme={minimalTheme({
+            assets: {
+              hero: { url: '/hero.png', as: 'image', preload: true },
+              lazy: '/lazy.png',
+            },
+          })}
+        />
+      </CountdownDataProvider>,
+    )
+    expect(
+      document.head.querySelector('link[rel="preload"][href="/hero.png"]'),
+    ).not.toBeNull()
+    expect(
+      document.head.querySelector('link[rel="preload"][href="/lazy.png"]'),
+    ).toBeNull()
+  })
+})

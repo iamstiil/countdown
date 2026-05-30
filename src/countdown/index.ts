@@ -12,6 +12,8 @@ export type {
   AudioBinding,
   HapticPattern,
   SlotInteractions,
+  FontDecl,
+  AssetDecl,
 } from './theming/types'
 export {
   useCountdownData,
@@ -27,6 +29,8 @@ export {
   buildDefsMarkup,
   type BuiltInFilterId,
 } from './theming/filterLibrary'
+export { resolveAssetUrl, normalizeAsset } from './theming/assets'
+export { useThemeAssets } from './theming/ThemeAssetsContext'
 export {
   isAudioEnabled,
   setAudioEnabled,
