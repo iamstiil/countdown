@@ -32,7 +32,7 @@ export function SlotRenderer({ node }: SlotRendererProps) {
   const Component = slotRegistry[node.type]
 
   const children =
-    node.type === 'group' && node.children
+    (node.type === 'group' || node.type === 'chrome') && node.children
       ? node.children.map((child) => (
           <SlotRenderer key={child.id} node={child} />
         ))

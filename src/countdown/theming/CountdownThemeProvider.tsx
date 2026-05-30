@@ -415,15 +415,22 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
             <defs dangerouslySetInnerHTML={{ __html: defsMarkup }} />
           </svg>
         )}
-        {layers.map((layer, idx) => (
-          <div
-            key={layer.key}
-            className="ct-layer"
-            data-layer-phase={idx === layers.length - 1 ? 'enter' : 'exit'}
-          >
-            <SlotRenderer node={layer.node} />
+        <div className="ct-safe">
+          {layers.map((layer, idx) => (
+            <div
+              key={layer.key}
+              className="ct-layer"
+              data-layer-phase={idx === layers.length - 1 ? 'enter' : 'exit'}
+            >
+              <SlotRenderer node={layer.node} />
+            </div>
+          ))}
+        </div>
+        {theme.chrome && (
+          <div className="ct-chrome" data-slot="chrome-layer">
+            <SlotRenderer node={theme.chrome} />
           </div>
-        ))}
+        )}
       </div>
     </ThemeAssetsContext.Provider>
   )

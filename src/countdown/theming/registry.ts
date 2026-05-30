@@ -1,4 +1,5 @@
 import { Background } from '../components/Background'
+import { Chrome } from '../components/Chrome'
 import { EffectLayer } from '../components/EffectLayer'
 import { EventTitle } from '../components/EventTitle'
 import { Group } from '../components/Group'
@@ -24,6 +25,7 @@ export const slotRegistry: Record<SlotType, SlotComponent<any>> = {
   progress: Progress,
   background: Background,
   group: Group,
+  chrome: Chrome,
   sprite: Sprite,
   particles: Particles,
   'effect-layer': EffectLayer,

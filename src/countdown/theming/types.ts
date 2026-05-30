@@ -14,6 +14,7 @@ export type SlotType =
   | 'progress'
   | 'background'
   | 'group'
+  | 'chrome'
   | 'sprite'
   | 'particles'
   | 'effect-layer'
@@ -81,6 +82,16 @@ export interface SlotBehaviorMap {
     mask?: string
   }
   group: Record<string, never>
+  /**
+   * Chrome container — a sibling of the main layout rendered into the
+   * unpadded viewport (outside `env(safe-area-inset-*)` padding). Use for
+   * decorations that should intentionally bleed to the device edges:
+   * bezel bolts, cabinet edges, page-edge tide marks. Children that
+   * still want to respect notches can reference `--ct-chrome-top` etc.
+   * Defaults to `pointer-events: none` so it doesn't intercept input;
+   * opt children back in with `pointer-events: auto`.
+   */
+  chrome: Record<string, never>
   sprite: {
     /** URL or data URI of the sprite sheet image. */
     src: string
@@ -261,6 +272,16 @@ export interface CountdownTheme {
    * for `idleAfterMs`. Falls back to `layout` when absent.
    */
   idleLayout?: SlotNode<'group'>
+  /**
+   * Optional chrome layer rendered as a sibling of the main layout,
+   * outside the safe-area padding. Used for decorations that must land
+   * at the device edges (bezel bolts, page-edge tide marks). The chrome
+   * layer is `pointer-events: none` by default; children opt in to
+   * receiving input. Chrome children that still want to dodge notches
+   * can reference the `--ct-chrome-{top,right,bottom,left}` tokens
+   * (set by the provider to `env(safe-area-inset-*)`).
+   */
+  chrome?: SlotNode<'chrome'>
   /**
    * Milliseconds of pointer/key/touch inactivity before the theme switches
    * to the `idle` state. Omit to disable idle entirely.

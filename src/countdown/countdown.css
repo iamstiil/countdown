@@ -18,10 +18,27 @@
   overflow: auto;
   z-index: 50;
 
-  /* Respect notches / home indicators on mobile. */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right)
-    env(safe-area-inset-bottom) env(safe-area-inset-left);
-  box-sizing: border-box;
+  /*
+   * Safe-area inset values exposed as tokens so chrome decorations can
+   * dodge notches when they want to, and so themes can read them in
+   * place of `env()`. The chrome layer (`.ct-chrome`) bypasses these.
+   */
+  --ct-chrome-top: env(safe-area-inset-top);
+  --ct-chrome-right: env(safe-area-inset-right);
+  --ct-chrome-bottom: env(safe-area-inset-bottom);
+  --ct-chrome-left: env(safe-area-inset-left);
+
+  /*
+   * Intentional stacking order across slot kinds. Themes override per
+   * slot via inline `vars` or per-class CSS; these defaults exist so
+   * background / content / chrome / effect / overlay never accidentally
+   * fight over z-index when authored independently.
+   */
+  --ct-z-bg: 0;
+  --ct-z-content: 10;
+  --ct-z-chrome: 20;
+  --ct-z-effect: 30;
+  --ct-z-overlay: 40;
 
   color: var(--ct-color-fg, inherit);
   background-color: var(--ct-color-bg, transparent);
@@ -35,6 +52,41 @@
   position: relative;
   width: 100%;
   min-height: 100%;
+}
+
+/* --- Safe-area wrapper -------------------------------------------------- */
+/*
+ * Holds the main layout layers; respects notches / home indicators on
+ * mobile. The chrome layer (below) is a sibling that intentionally
+ * escapes this padding.
+ */
+[data-ct-theme] .ct-safe {
+  position: absolute;
+  inset: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+  z-index: var(--ct-z-content);
+}
+
+/* --- Chrome layer ------------------------------------------------------- */
+/*
+ * Sibling of `.ct-safe` rendered against the unpadded viewport so
+ * decorations (bezel bolts, cabinet edges, page-edge tide marks) can
+ * land at the device edges. Pointer events default off so chrome
+ * doesn't intercept input from the layout beneath; opt children back
+ * in with `pointer-events: auto`.
+ */
+[data-ct-theme] .ct-chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--ct-z-chrome);
+}
+
+[data-ct-theme] .ct-chrome [data-slot='chrome'] {
+  position: absolute;
+  inset: 0;
 }
 
 /* --- State layers ------------------------------------------------------- */
