@@ -5,8 +5,32 @@ import { GestureWrapper } from '../components/GestureWrapper'
 
 import { slotRegistry } from './registry'
 import { resolveResponsive } from './resolveResponsive'
-import type { SlotNode } from './types'
+import type { Breakpoint, SlotNode } from './types'
 import { useBreakpoint } from './useBreakpoint'
+
+const BP_ORDER: Breakpoint[] = ['base', 'sm', 'md', 'lg', 'xl']
+
+/**
+ * className is additive across breakpoints — every defined breakpoint up to
+ * (and including) the current one is concatenated. This lets themes declare
+ * shared base classes once and only add breakpoint-specific modifiers at
+ * higher tiers, without losing the base classes (which would happen with
+ * full replacement semantics).
+ */
+function resolveClassName(
+  value: Partial<Record<Breakpoint, string>> | undefined,
+  current: Breakpoint,
+): string | undefined {
+  if (!value) return undefined
+  const currentIdx = BP_ORDER.indexOf(current)
+  const parts: string[] = []
+  for (let i = 0; i <= currentIdx; i += 1) {
+    const v = value[BP_ORDER[i]]
+    if (v) parts.push(v)
+  }
+  const merged = parts.join(' ').trim()
+  return merged.length > 0 ? merged : undefined
+}
 
 export interface SlotRendererProps {
   node: SlotNode
@@ -15,8 +39,7 @@ export interface SlotRendererProps {
 export function SlotRenderer({ node }: SlotRendererProps) {
   const bp = useBreakpoint()
   const visible = resolveResponsive(node.visible, bp, true)
-  const className =
-    resolveResponsive(node.classes?.className, bp, '') || undefined
+  const className = resolveClassName(node.classes?.className, bp)
   const vars = resolveResponsive(node.vars, bp, {} as Record<string, string>)
 
   const style = useMemo<CSSProperties | undefined>(() => {

@@ -5,9 +5,7 @@ import type { AssetDecl } from './types'
  * a full record. Returns `null` for `undefined` so callers can pass
  * through optional lookups.
  */
-export function normalizeAsset(
-  decl: AssetDecl | undefined,
-): {
+export function normalizeAsset(decl: AssetDecl | undefined): {
   url: string
   as?: 'image' | 'audio' | 'fetch'
   preload: boolean
