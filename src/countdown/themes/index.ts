@@ -25,7 +25,7 @@ export const themeSwatch: Record<ThemeId, string> = {
   'minimal-stack':
     'radial-gradient(ellipse 60% 30% at 12% 92%, #b4452b22 0, transparent 65%), linear-gradient(180deg, #f6f3ec 0%, #ece6d7 100%)',
   aurora:
-    'radial-gradient(at 18% 18%, #a78bfa88 0, transparent 55%), radial-gradient(at 82% 28%, #22d3ee66 0, transparent 55%), radial-gradient(at 50% 92%, #f472b666 0, transparent 55%), #0b0c20',
+    'radial-gradient(ellipse 90% 40% at 30% 38%, #5eead499 0%, transparent 60%), radial-gradient(ellipse 75% 32% at 70% 24%, #c4a8ffaa 0%, transparent 65%), radial-gradient(ellipse 110% 28% at 50% 90%, #5eead455 0%, transparent 75%), radial-gradient(ellipse 80% 60% at 50% 15%, #1a1240 0%, transparent 70%), linear-gradient(180deg, #070a1a 0%, #02030c 100%)',
   monolith:
     'radial-gradient(ellipse 80% 50% at 50% 100%, #f5f5f414 0%, transparent 70%), #0a0a0a',
   'tide-letters':

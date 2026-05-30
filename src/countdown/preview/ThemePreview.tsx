@@ -10,7 +10,7 @@ export type PreviewVariant = 'centered' | 'bottom-left' | 'card' | 'monolith'
 const PREVIEW_VARIANT: Record<ThemeId, PreviewVariant> = {
   'neon-grid': 'centered',
   'minimal-stack': 'bottom-left',
-  aurora: 'card',
+  aurora: 'centered',
   monolith: 'monolith',
   'tide-letters': 'bottom-left',
   'pocket-arcade': 'card',
