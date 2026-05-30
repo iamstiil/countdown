@@ -130,6 +130,33 @@ export interface SlotClasses {
   className?: Responsive<string>
 }
 
+/**
+ * Declarative gesture bindings on a slot. Values are free-form action
+ * names dispatched to the action bus (see `useGestureAction`) when the
+ * gesture fires; the gesture wrapper also stamps `data-gesture="<name>"`
+ * on its DOM root for one frame so themes can react in pure CSS.
+ */
+export interface SlotInteractions {
+  /** Single pointer tap (no significant movement, under 250ms). */
+  tap?: string
+  /** Two taps within ~280ms on the same element. */
+  doubleTap?: string
+  /** Pointer held for ~500ms without moving past the slop threshold. */
+  longPress?: string
+  /**
+   * Horizontal/vertical swipe past a distance threshold. When fired, the
+   * wrapper also stamps `data-swipe-dir` ('up' | 'down' | 'left' | 'right').
+   */
+  swipe?: string
+  /**
+   * Pull-to-refresh on a downward drag from the top edge. While the user
+   * drags the wrapper writes `--ct-pull` (0..1) so themes can style the
+   * curl entirely in CSS. The action fires once when the user releases
+   * past `--ct-pull-threshold` (default 0.6).
+   */
+  pull?: string
+}
+
 export interface SlotNode<K extends SlotType = SlotType> {
   id: string
   type: K
@@ -139,6 +166,8 @@ export interface SlotNode<K extends SlotType = SlotType> {
   classes?: SlotClasses
   children?: SlotNode[]
   props?: SlotBehaviorMap[K]
+  /** Optional gesture bindings (Phase 6). */
+  interactions?: SlotInteractions
 }
 
 export interface TokenSet {
@@ -248,6 +277,13 @@ export interface CountdownTheme {
    * (e.g. final-minute warning) rather than decorative.
    */
   audioIgnoresReducedMotion?: boolean
+  /**
+   * Opt into device-orientation parallax. When true, the provider
+   * requests permission on iOS (gesture-gated) and writes
+   * `--ct-tilt-x` and `--ct-tilt-y` (normalized −1..1) on the theme
+   * root at rAF rate. No-ops on devices without DeviceOrientation.
+   */
+  tilt?: boolean
   /** Optional keyframes/animation rules injected as a <style> block. */
   animations?: Record<string, string>
 }

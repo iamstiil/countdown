@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
 import type { CSSProperties } from 'react'
 
+import { GestureWrapper } from '../components/GestureWrapper'
+
 import { slotRegistry } from './registry'
 import { resolveResponsive } from './resolveResponsive'
 import type { SlotNode } from './types'
@@ -36,15 +38,24 @@ export function SlotRenderer({ node }: SlotRendererProps) {
         ))
       : undefined
 
-  return (
+  const rendered = (
     <Component
       id={node.id}
       className={className}
       style={style}
-       
       props={node.props as any}
     >
       {children}
     </Component>
   )
+
+  if (node.interactions) {
+    return (
+      <GestureWrapper interactions={node.interactions}>
+        {rendered}
+      </GestureWrapper>
+    )
+  }
+
+  return rendered
 }

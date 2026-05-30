@@ -28,6 +28,9 @@ const ACTIVITY_EVENTS = [
   'wheel',
 ] as const
 
+const clamp = (n: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, n))
+
 /**
  * Roots a single countdown theme. Tokens are scoped to [data-ct-theme="id"]
  * so they cannot leak into the surrounding (landing page) design system.
@@ -91,6 +94,98 @@ export function CountdownThemeProvider({ theme }: CountdownThemeProviderProps) {
       }
     }
   }, [idleAfterMs])
+
+  // --- Tilt parallax ---------------------------------------------------
+  // Writes --ct-tilt-x and --ct-tilt-y (normalized -1..1) on the theme
+  // root at rAF rate. On iOS the DeviceOrientationEvent API is gated
+  // behind a permission prompt that must be triggered from a user
+  // gesture; we attach a one-shot gesture listener for that.
+  useEffect(() => {
+    if (!theme.tilt) return
+    if (typeof window === 'undefined') return
+    if (typeof DeviceOrientationEvent === 'undefined') return
+
+    const rootRefForCleanup = rootRef.current
+    let stopped = false
+    let rafId = 0
+    let latestX = 0
+    let latestY = 0
+    let detachPermission = () => {}
+
+    const onOrientation = (e: DeviceOrientationEvent) => {
+      // beta: front-to-back tilt (-180..180), gamma: left-to-right (-90..90).
+      // Normalize a comfortable phone-tilt range (~30°) to -1..1.
+      const gy = e.beta ?? 0
+      const gx = e.gamma ?? 0
+      latestX = clamp(gx / 30, -1, 1)
+      latestY = clamp(gy / 30, -1, 1)
+    }
+
+    const loop = () => {
+      if (stopped) return
+      const el = rootRef.current
+      if (el) {
+        el.style.setProperty('--ct-tilt-x', latestX.toFixed(3))
+        el.style.setProperty('--ct-tilt-y', latestY.toFixed(3))
+      }
+      rafId = window.requestAnimationFrame(loop)
+    }
+
+    const attach = () => {
+      window.addEventListener('deviceorientation', onOrientation, {
+        passive: true,
+      })
+      rafId = window.requestAnimationFrame(loop)
+    }
+
+    const maybeRequestPermission = (
+      Ctor: typeof DeviceOrientationEvent & {
+        requestPermission?: () => Promise<'granted' | 'denied'>
+      },
+    ) => {
+      if (typeof Ctor.requestPermission !== 'function') {
+        attach()
+        return
+      }
+      // iOS-style: must be triggered from a user gesture.
+      const onGesture = () => {
+        Ctor.requestPermission!()
+          .then((result) => {
+            if (result === 'granted') attach()
+          })
+          .catch(() => {
+            /* user denied or browser refused */
+          })
+      }
+      const opts = { once: true, passive: true } as AddEventListenerOptions
+      window.addEventListener('pointerdown', onGesture, opts)
+      window.addEventListener('keydown', onGesture, opts)
+      window.addEventListener('touchstart', onGesture, opts)
+      detachPermission = () => {
+        window.removeEventListener('pointerdown', onGesture)
+        window.removeEventListener('keydown', onGesture)
+        window.removeEventListener('touchstart', onGesture)
+      }
+    }
+
+    maybeRequestPermission(
+      DeviceOrientationEvent as typeof DeviceOrientationEvent & {
+        requestPermission?: () => Promise<'granted' | 'denied'>
+      },
+    )
+
+    return () => {
+      stopped = true
+      detachPermission()
+      window.removeEventListener('deviceorientation', onOrientation)
+      if (rafId !== 0) window.cancelAnimationFrame(rafId)
+      const el = rootRefForCleanup
+      if (el) {
+        el.style.removeProperty('--ct-tilt-x')
+        el.style.removeProperty('--ct-tilt-y')
+      }
+    }
+  }, [theme.tilt])
 
   // --- Audio + haptics -------------------------------------------------
   // We track audio-enabled in a ref so the engine's closure sees the

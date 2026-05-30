@@ -8,6 +8,7 @@ import {
 } from 'react'
 import type { ReactNode } from 'react'
 
+import { createActionBus, type ActionBus, type ActionListener } from './actions'
 import {
   createCountdownEventBus,
   type CountdownEventBus,
@@ -53,6 +54,7 @@ const computeRemaining = (target: Date): Remaining => {
 
 const CountdownDataContext = createContext<CountdownData | null>(null)
 const CountdownEventsContext = createContext<CountdownEventBus | null>(null)
+const CountdownActionsContext = createContext<ActionBus | null>(null)
 
 /**
  * Continuous (sub-second) elapsed-fraction signal. Lives outside of React
@@ -97,6 +99,7 @@ export function CountdownDataProvider({
 
   // One bus per provider instance.
   const bus = useMemo(() => createCountdownEventBus(), [])
+  const actionBus = useMemo(() => createActionBus(), [])
 
   useEffect(() => {
     const initial = computeRemaining(targetDate)
@@ -235,9 +238,11 @@ export function CountdownDataProvider({
   return (
     <CountdownDataContext.Provider value={value}>
       <CountdownEventsContext.Provider value={bus}>
-        <ContinuousProgressContext.Provider value={continuousProgress}>
-          {children}
-        </ContinuousProgressContext.Provider>
+        <CountdownActionsContext.Provider value={actionBus}>
+          <ContinuousProgressContext.Provider value={continuousProgress}>
+            {children}
+          </ContinuousProgressContext.Provider>
+        </CountdownActionsContext.Provider>
       </CountdownEventsContext.Provider>
     </CountdownDataContext.Provider>
   )
@@ -306,4 +311,39 @@ export function useThemeEffect(
     return subscribe(event, handler)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event, subscribe, ...deps])
+}
+
+/**
+ * Access the gesture/action bus. Themes emit free-form action names
+ * (e.g. `'smear'`, `'refresh'`) via gestures or custom UI; consumers
+ * subscribe with `useGestureAction`.
+ */
+export function useThemeActions(): {
+  subscribe: (name: string, listener: ActionListener) => () => void
+  emit: (name: string) => void
+} {
+  const bus = useContext(CountdownActionsContext)
+  if (!bus) {
+    throw new Error(
+      'useThemeActions must be used inside <CountdownDataProvider>',
+    )
+  }
+  return { subscribe: bus.subscribe, emit: bus.emit }
+}
+
+/**
+ * Subscribe to a named theme action (typically dispatched by the gesture
+ * wrapper). Handler is automatically unsubscribed on unmount or when
+ * `deps` change.
+ */
+export function useGestureAction(
+  name: string,
+  handler: ActionListener,
+  deps: ReadonlyArray<unknown> = [],
+): void {
+  const { subscribe } = useThemeActions()
+  useEffect(() => {
+    return subscribe(name, handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, subscribe, ...deps])
 }

@@ -11,13 +11,17 @@ export type {
   SoundDecl,
   AudioBinding,
   HapticPattern,
+  SlotInteractions,
 } from './theming/types'
 export {
   useCountdownData,
   useCountdownEvents,
   useContinuousProgress,
   useThemeEffect,
+  useThemeActions,
+  useGestureAction,
 } from './data/CountdownDataContext'
+export type { ActionBus, ActionListener } from './data/actions'
 export {
   isAudioEnabled,
   setAudioEnabled,
