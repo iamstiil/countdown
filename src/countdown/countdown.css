@@ -167,10 +167,18 @@
 
 [data-ct-theme] [data-slot='timer'] {
   display: flex;
-  flex-wrap: wrap;
+  /* Keep all units (D/H/M/S) on a single row across viewport sizes.
+     Narrow-viewport overrides below shrink gap, min-width and font-size
+     so the row stays legible without wrapping. */
+  flex-wrap: nowrap;
   align-items: flex-start;
   justify-content: var(--ct-timer-justify, inherit);
   gap: var(--ct-timer-gap, clamp(0.75rem, 3vw, 2rem));
+  /* Permit horizontal shrinking when this slot itself sits in a flex
+     parent (most theme layouts), so the nowrap row can match the
+     available width rather than overflowing the page card. */
+  min-width: 0;
+  max-width: 100%;
   font-variant-numeric: tabular-nums;
   font-feature-settings:
     'tnum' on,
@@ -208,6 +216,36 @@
   opacity: var(--ct-opacity-label, 0.85);
   /* Themes can hide labels entirely (e.g. the monolith theme). */
   display: var(--ct-label-display, block);
+  /* Prevent overlong unit labels (e.g. "MINUTES"/"SECONDS") from wrapping
+     onto a second line within their unit-block. */
+  white-space: nowrap;
+}
+
+/* Narrow-viewport guardrails — ensure the timer always fits on one row
+   even on small phones (≤480px). Theme `vars` are applied inline as CSS
+   custom properties; the overrides below set the consuming property
+   directly so they win over the var-driven defaults. */
+@media (max-width: 480px) {
+  [data-ct-theme] [data-slot='timer'] {
+    gap: clamp(0.25rem, 1.6vw, 0.55rem);
+  }
+  [data-ct-theme] [data-slot='timer'] [data-unit-block] {
+    /* Inline-set --ct-unit-min-width values (e.g. 3ch) would otherwise
+       reserve too much horizontal space for a 4-block row. */
+    min-width: 0;
+  }
+  [data-ct-theme] [data-slot='timer'] [data-value] {
+    /* Cap the theme's display size to a viewport-relative width so
+       4 unit blocks + 3 gaps fit in the available row. */
+    font-size: min(var(--ct-size-timer, 3rem), 10.5vw);
+  }
+  [data-ct-theme] [data-slot='timer'] [data-label] {
+    /* Aggressively shrink labels so they don't widen unit-blocks past
+       the available row width on small phones. Tracking is reduced to
+       keep multi-letter labels (MINUTES/SECONDS) inside their block. */
+    font-size: min(var(--ct-size-label, 0.72rem), 2vw);
+    letter-spacing: 0.05em;
+  }
 }
 
 /* --- Per-digit DOM (splitDigits) ---------------------------------------- */
