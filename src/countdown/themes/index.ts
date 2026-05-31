@@ -27,7 +27,7 @@ export const themeSwatch: Record<ThemeId, string> = {
   aurora:
     'radial-gradient(ellipse 90% 40% at 30% 38%, #5eead499 0%, transparent 60%), radial-gradient(ellipse 75% 32% at 70% 24%, #c4a8ffaa 0%, transparent 65%), radial-gradient(ellipse 110% 28% at 50% 90%, #5eead455 0%, transparent 75%), radial-gradient(ellipse 80% 60% at 50% 15%, #1a1240 0%, transparent 70%), linear-gradient(180deg, #070a1a 0%, #02030c 100%)',
   monolith:
-    'radial-gradient(ellipse 80% 50% at 50% 100%, #f5f5f414 0%, transparent 70%), #0a0a0a',
+    'radial-gradient(ellipse 55% 90% at 100% 50%, #d99b5833 0%, transparent 65%), radial-gradient(ellipse 90% 45% at 50% 100%, #000 0%, transparent 70%), linear-gradient(180deg, #0b0d10 0%, #15181d 55%, #06080a 100%)',
   'tide-letters':
     'radial-gradient(ellipse 80% 60% at 20% 12%, #fff0d288 0, transparent 60%), radial-gradient(ellipse 70% 60% at 75% 95%, #2c6a6a99 0, transparent 70%), #f3ead7',
   'pocket-arcade':

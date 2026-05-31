@@ -325,6 +325,105 @@ rather than emotional.
 
 ---
 
+## Theme 6 — Monolith
+
+**Central concept:** Time as a single carved slab of stone. The viewer
+is standing at the foot of a massive block of polished basalt; late,
+raking sunlight from camera-right catches the leading edge with a thin
+amber rim, and the digits are not _displayed_ — they are _cut_ into
+the face. Anticipation is reframed as something monumental and
+geological: the count is a thing that was always going to happen, and
+the stone has already been waiting.
+
+### Visual style
+
+A six-layer cinematic build sells the volume of a single block in the
+centre of the frame. A vertical graphite gradient establishes the
+slab; a cool fill light from the shaded left flank rounds the form; a
+warm amber raking light grazes the right edge (the one chromatic note
+in the composition, held to roughly 22% via `color-mix` so it reads
+as light, not paint); a plinth shadow pools at the floor so the block
+visibly _sits_ rather than floats; a faint repeating-conic
+"carved-stone" grain sits under `mix-blend-overlay` with a
+radial mask so it never tiles; a corner vignette anchors focus on the
+slab face.
+
+The timer itself is the monolith. Black-weight (900) Archivo glyphs
+with tight negative tracking (`-0.06em` at desktop) carry a
+dual-edge `engraved-digit` text shadow — a bone highlight pixel
+above, a hard shadow pixel below, plus a soft amber bloom in the rim
+direction — so each character reads as a raised face catching
+directional light. The four DD HH MM SS courses are separated by thin
+amber-tinted vertical seams rendered as `:not(:first-child)::before`
+pseudo-elements, suggesting the slab is assembled from precision-
+fitted blocks rather than printed on. Unit labels are kept (tiny,
+wide-tracked, engraved) so the architecture reads as _measured_ stone,
+not abstract typography.
+
+The eyebrow title inverts the digit shadow — light _below_, shadow
+_above_ — so the title reads as chiselled-in rather than printed-on,
+sitting recessed against the stone face. A single quiet basalt-grey
+subtitle rests below the slab. Progress renders as a row of segmented
+"courses of stone" notches that fill with the warm rim hue as time
+elapses, like sunlight slowly crossing the face of the block.
+
+### Color palette direction
+
+A five-color graphite + bone + warm-rim system that refuses to
+saturate.
+
+- **Charcoal** (`#0b0d10`) — the unlit face of the stone. Deep,
+  slightly cool, never pure black.
+- **Panel graphite** (`#15181d`) — the marginally lighter mid-band
+  inside the slab gradient. Sells the curvature without ever becoming
+  a highlight.
+- **Bone** (`#ece8de`) — the digit face. Warm off-white so it reads
+  against the amber rim without going clinical.
+- **Amber rim** (`#d99b58`) — the one chromatic accent. Used three
+  times: the raking light layer, the seam tint, and the progress
+  fill. Saturation is dialled back via `color-mix` everywhere it
+  appears so the warmth feels like reflected sun, never paint.
+- **Slate fill** (`#6f7c8c`) — the cool fill light on the shaded
+  flank. Almost invisible — its job is to keep the stone from going
+  flat, not to be noticed.
+- **Basalt grey** (`#4a5057`) — structural muted; carries the label
+  text and separator weight.
+
+No gradients on the type. No glow halos on the digits. The only
+"effect" on the foreground is the embossed shadow that gives the
+glyphs their raised stone face.
+
+### UI behavior / animations
+
+- The rim light breathes by roughly 10% over an 18s period — long
+  enough that it reads as ambient warmth, not as a heartbeat.
+- The seams shimmer over a 9s period at architectural tempo, as if a
+  hairline of light is escaping between two precision-fitted blocks.
+- Both animations are gated by `motion-safe:` and emptied in the
+  `reducedMotion` variant. The composition holds at 0fps — slab,
+  rim, plinth, grain, and embossing are all static-friendly.
+- Default digit transition is the global `fade` — the carved stone
+  conceit forbids flips, flaps, and odometers; the slab does not
+  spin.
+- Progress is a row of four segmented notches (`kind: 'segments'`,
+  `direction: 'elapsed'`), tinted with the warm rim hue and a
+  restrained `progress-glow`. Each segment lights as a "course of
+  stone" catches the sun.
+- Responsive sizing scales the slab in three steps (`base`, `md`,
+  `lg`) while keeping the four courses on a single row at every
+  breakpoint — the gap and per-block padding widen on desktop so the
+  seams remain visible at full weight.
+
+### Emotional experience
+
+Monumental, premium, geological. The viewer feels they are standing
+in front of something that has _gravity_ — not racing toward an
+event, but waiting at the foot of one. Best for product unveilings,
+major version cuts, regulated launches, IPO countdowns, anything
+where the right tone is _inevitable_ rather than urgent.
+
+---
+
 ## How they diverge
 
 Tide Letters is hushed, organic, and analog-emotional (paper + water + ink,
@@ -334,5 +433,6 @@ spatial, and signal-emotional (void + light + grid, horizon-anchored,
 glacial). Aurora is calm, atmospheric, and reverent-emotional (sky +
 ribbon + bloom, zenith-anchored, drifting). Minimal Stack is composed,
 typographic, and editorial-emotional (paper + ink + rule, top-and-bottom
-anchored, still). Five different materials, five different tempos, five
-different feelings — no shared tropes.
+anchored, still). Monolith is monumental, geological, and
+inevitable-emotional (stone + raking light + seam, slab-anchored,
+breathing). Six different materials, six different tempos, six
