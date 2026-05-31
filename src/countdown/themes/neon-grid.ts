@@ -162,13 +162,19 @@ export const neonGridTheme: CountdownTheme = {
 
       /* (3) Ghost timer — desaturated tombstone of 00:00:00:00. The
          labels stay legible (muted cyan) so the structure reads as
-         "what just elapsed", not "broken loading state". */
+         "what just elapsed", not "broken loading state". The four unit
+         blocks must stay on a single transmission line at every
+         breakpoint, so we both clamp the digit size down to a ghost
+         scale and forbid wrapping outright. */
       [data-ct-theme="neon-grid"][data-state="done"] [data-slot="timer"] {
         opacity: 0.28;
         filter: grayscale(40%);
+        flex-wrap: nowrap;
+        max-width: 100%;
         transition: opacity 600ms ease, filter 600ms ease;
       }
       [data-ct-theme="neon-grid"][data-state="done"] [data-slot="timer"] [data-value] {
+        font-size: var(--ct-size-timer);
         text-shadow: none;
       }
 
@@ -686,15 +692,20 @@ export const neonGridTheme: CountdownTheme = {
 
           // Ghost timer — kept as orientation cue, desaturated by the
           // `done` rules. Same props as the live timer so unit labels
-          // and structure persist; only opacity/filter change.
+          // and structure persist; only opacity/filter change. Sizes are
+          // explicitly overridden here (rather than inheriting the live
+          // hero timer scale) so the four unit blocks always fit on a
+          // single row beneath the SYS://LIVE hero — even on ultrawide
+          // viewports where the live `--ct-size-timer` caps at 10rem.
           {
             id: 'timer',
             type: 'timer',
             props: { format: 'dhms', padZeros: true },
             vars: {
               base: {
+                'ct-size-timer': 'clamp(1.2rem, 4vw, 2rem)',
                 'ct-timer-gap': '0.6rem',
-                'ct-unit-gap': '0.6rem',
+                'ct-unit-gap': '0.35rem',
                 'ct-unit-min-width': '2ch',
                 'ct-weight-timer': '700',
                 'ct-tracking-timer': '-0.03em',
@@ -703,13 +714,17 @@ export const neonGridTheme: CountdownTheme = {
                   'color-mix(in oklab, var(--ct-color-accent), transparent 35%)',
               },
               md: {
+                'ct-size-timer': 'clamp(1.5rem, 3vw, 2.25rem)',
                 'ct-timer-gap': '1.2rem',
                 'ct-unit-min-width': '2.4ch',
+              },
+              lg: {
+                'ct-size-timer': 'clamp(1.75rem, 2.4vw, 2.5rem)',
               },
             },
             classes: {
               className: {
-                base: '[&_[data-label]]:font-[var(--ct-font-label)] [&_[data-label]]:tracking-[0.4em] [&_[data-label]]:uppercase [&_[data-label]]:text-[length:var(--ct-size-label)] text-[length:clamp(1.2rem,4vw,2rem)]',
+                base: '[&_[data-label]]:font-[var(--ct-font-label)] [&_[data-label]]:tracking-[0.4em] [&_[data-label]]:uppercase [&_[data-label]]:text-[length:var(--ct-size-label)]',
               },
             },
           },
