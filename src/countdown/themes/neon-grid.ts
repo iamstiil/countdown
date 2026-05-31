@@ -56,9 +56,11 @@ export const neonGridTheme: CountdownTheme = {
           '"JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
       },
       size: {
-        // Timer scales aggressively on mobile so the digits dominate the
-        // viewport; capped so they never overflow on ultrawide displays.
-        timer: 'clamp(3.25rem, 14vw, 7.5rem)',
+        // Timer scales with viewport width so all four unit blocks stay on a
+        // single horizontal "transmission line" from ~360px phones up to
+        // ultrawide displays. The lower bound keeps narrow viewports legible;
+        // the upper bound keeps the hero from dominating ultrawide layouts.
+        timer: 'clamp(2.25rem, 11vw, 7.5rem)',
         title: 'clamp(0.72rem, 1.8vw, 0.88rem)',
         subtitle: 'clamp(0.85rem, 1.6vw, 1rem)',
         label: '0.7rem',
@@ -81,14 +83,14 @@ export const neonGridTheme: CountdownTheme = {
     md: {
       // Larger breakpoint: bigger hero, bigger eyebrow.
       size: {
-        timer: 'clamp(5rem, 11vw, 10.5rem)',
+        timer: 'clamp(3.5rem, 9vw, 8.5rem)',
         title: '0.95rem',
         subtitle: 'clamp(0.95rem, 1.4vw, 1.1rem)',
       },
     },
     lg: {
       size: {
-        timer: 'clamp(6rem, 10vw, 12rem)',
+        timer: 'clamp(4.5rem, 8.5vw, 10rem)',
       },
     },
   },
@@ -198,8 +200,8 @@ export const neonGridTheme: CountdownTheme = {
         type: 'group',
         classes: {
           className: {
-            base: 'relative flex flex-col items-center gap-8 px-6 py-12 text-center w-full max-w-3xl',
-            md: 'md:gap-12 md:py-16',
+            base: 'relative flex flex-col items-center gap-8 px-4 py-12 text-center w-full max-w-[min(96vw,72rem)]',
+            md: 'md:gap-12 md:px-6 md:py-16',
           },
         },
         children: [
@@ -250,9 +252,13 @@ export const neonGridTheme: CountdownTheme = {
             props: { format: 'dhms', padZeros: true },
             vars: {
               base: {
-                'ct-timer-gap': '1.5rem',
+                // Gaps and min-widths are tuned so 4 unit blocks fit on a
+                // single horizontal row at common mobile widths (~360-500px)
+                // without forcing wrap. Digits — not the min-width floor —
+                // drive each unit's actual width.
+                'ct-timer-gap': '0.6rem',
                 'ct-unit-gap': '0.6rem',
-                'ct-unit-min-width': '3ch',
+                'ct-unit-min-width': '2ch',
                 'ct-weight-timer': '700',
                 'ct-tracking-timer': '-0.03em',
                 'ct-color-value': 'var(--ct-color-fg)',
@@ -262,13 +268,13 @@ export const neonGridTheme: CountdownTheme = {
                 'ct-text-shadow': 'var(--ct-effect-glow)',
               },
               md: {
-                'ct-timer-gap': '3rem',
+                'ct-timer-gap': '1.5rem',
                 'ct-unit-gap': '0.9rem',
-                'ct-unit-min-width': '3.5ch',
+                'ct-unit-min-width': '2.4ch',
               },
               lg: {
-                'ct-timer-gap': '3.75rem',
-                'ct-unit-min-width': '4ch',
+                'ct-timer-gap': '2.25rem',
+                'ct-unit-min-width': '2.6ch',
               },
             },
             classes: {
