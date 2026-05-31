@@ -158,6 +158,149 @@ export const monolithTheme: CountdownTheme = {
     // without becoming a heartbeat. 18s period.
     'monolith-rim':
       '@keyframes ct-monolith-rim{0%,100%{opacity:.85;transform:translateX(0)}50%{opacity:1;transform:translateX(-0.6%)}}',
+    // ─── Done scene — "Engraved Inscription" ─────────────────────────
+    //
+    // The digits resolve into the event title, cut into the stone with
+    // the same engraved-digit shadow. No scenery shift, no new
+    // metaphor — the monolith was always going to bear this
+    // inscription; the countdown was the wait for it to be revealed.
+    //
+    //   t=0     existing rim breathing/seam shimmer hold
+    //   t=200   hero event title cuts in (engraved shadow, 900-weight)
+    //   t=700   inscription kicker fades up ("ARRIVED · MMXXVI")
+    //   t=1100  seams brighten one cycle, rim catches the new lettering
+    //   t=1500  CTA pill rises and receives focus
+    //
+    // Reduced motion stamps the final frame.
+    done: `
+      /* (1) Hero event title — cut into the stone. Same embossed
+         shadow vocabulary as the digits, same weight/tracking. */
+      [data-ct-theme="monolith"] .mo-win-hero {
+        font-family: var(--ct-font-display);
+        font-weight: 900;
+        font-size: clamp(2.4rem, 11vw, 7rem);
+        line-height: 0.92;
+        letter-spacing: -0.05em;
+        text-align: center;
+        color: var(--ct-color-fg);
+        text-shadow: var(--ct-effect-engraved-digit);
+        opacity: 0;
+        transform: translateY(6px);
+        animation: mo-cut-in 620ms cubic-bezier(0.22, 1, 0.36, 1) 200ms forwards;
+      }
+      @keyframes mo-cut-in {
+        0%   { opacity: 0; transform: translateY(6px); filter: blur(2px); }
+        60%  { opacity: 1; transform: translateY(0);   filter: blur(0); }
+        100% { opacity: 1; transform: translateY(0);   filter: blur(0); }
+      }
+
+      /* (2) Inscription kicker — small tracked engraved line beneath
+         the hero. Recessed shadow (light below, shadow above) to read
+         as chiselled-in. Text provided via ::before. */
+      [data-ct-theme="monolith"] .mo-win-inscription {
+        font-family: var(--ct-font-label);
+        font-weight: 500;
+        font-size: clamp(0.62rem, 1vw, 0.74rem);
+        letter-spacing: 0.46em;
+        text-transform: uppercase;
+        text-align: center;
+        color: color-mix(in oklab, var(--ct-color-title), transparent 25%);
+        text-shadow: var(--ct-effect-engraved-title);
+        padding-left: 0.46em;
+        opacity: 0;
+        animation: mo-fade-up 520ms ease-out 700ms forwards;
+      }
+      [data-ct-theme="monolith"] .mo-win-inscription::before {
+        content: "ARRIVED · MMXXVI";
+      }
+
+      @keyframes mo-fade-up {
+        0%   { opacity: 0; transform: translateY(4px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      /* (3) Seam + rim one-shot brightening: the inscription is being
+         lit by the raking sun catching the new lettering. */
+      [data-ct-theme="monolith"][data-state="done"] [data-slot="background"]#bg-rim-light {
+        animation: mo-rim-flare 1.6s ease-out 1100ms both,
+                   ct-monolith-rim 18s ease-in-out 2700ms infinite;
+      }
+      @keyframes mo-rim-flare {
+        0%   { opacity: 0.85; filter: blur(24px) brightness(1); }
+        40%  { opacity: 1;    filter: blur(18px) brightness(1.4); }
+        100% { opacity: 0.9;  filter: blur(24px) brightness(1.05); }
+      }
+
+      /* (4) CTA pill — bone-on-graphite with a thin amber rim. Quiet,
+         engineered, matches the monolith's restraint. */
+      [data-ct-theme="monolith"] .mo-win-cta {
+        font-family: var(--ct-font-display);
+        font-weight: 600;
+        font-size: clamp(0.78rem, 1.4vw, 0.92rem);
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: var(--ct-color-fg);
+        padding: 0.95rem 1.9rem;
+        border: 1px solid color-mix(in oklab, var(--ct-color-accent), transparent 55%);
+        border-radius: 2px;
+        background:
+          linear-gradient(180deg,
+            color-mix(in oklab, var(--ct-color-panel), transparent 20%) 0%,
+            color-mix(in oklab, var(--ct-color-bg),    transparent 10%) 100%);
+        box-shadow:
+          inset 0 1px 0 color-mix(in oklab, var(--ct-color-fg), transparent 80%),
+          0 0 0 0 color-mix(in oklab, var(--ct-color-accent), transparent 60%),
+          0 6px 16px rgba(0, 0, 0, 0.55);
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: mo-cta-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) 1500ms forwards;
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+      [data-ct-theme="monolith"] .mo-win-cta::before { content: "Enter the gate ▸"; }
+      [data-ct-theme="monolith"] .mo-win-cta:hover,
+      [data-ct-theme="monolith"] .mo-win-cta:focus-visible {
+        transform: translateY(-1px);
+        outline: none;
+        border-color: color-mix(in oklab, var(--ct-color-accent), transparent 25%);
+        background:
+          linear-gradient(180deg,
+            color-mix(in oklab, var(--ct-color-panel), var(--ct-color-accent) 6%) 0%,
+            color-mix(in oklab, var(--ct-color-bg),    transparent 10%) 100%);
+        box-shadow:
+          inset 0 1px 0 color-mix(in oklab, var(--ct-color-fg), transparent 75%),
+          0 0 24px color-mix(in oklab, var(--ct-color-accent), transparent 70%),
+          0 10px 22px rgba(0, 0, 0, 0.6);
+      }
+      [data-ct-theme="monolith"] .mo-win-cta:active {
+        transform: translateY(0);
+        box-shadow:
+          inset 0 1px 0 color-mix(in oklab, var(--ct-color-fg), transparent 80%),
+          0 0 10px color-mix(in oklab, var(--ct-color-accent), transparent 80%),
+          0 3px 8px rgba(0, 0, 0, 0.55);
+      }
+
+      @keyframes mo-cta-rise {
+        0%   { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Reduced motion: stamp the final frame, no choreography. */
+      @media (prefers-reduced-motion: reduce) {
+        [data-ct-theme="monolith"] .mo-win-hero,
+        [data-ct-theme="monolith"] .mo-win-inscription,
+        [data-ct-theme="monolith"] .mo-win-cta,
+        [data-ct-theme="monolith"][data-state="done"] [data-slot="background"]#bg-rim-light {
+          animation: none;
+        }
+        [data-ct-theme="monolith"] .mo-win-hero,
+        [data-ct-theme="monolith"] .mo-win-inscription,
+        [data-ct-theme="monolith"] .mo-win-cta {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    `,
   },
   layout: {
     id: 'root',
@@ -421,5 +564,153 @@ export const monolithTheme: CountdownTheme = {
   // 0fps), and just empty the keyframes registry so nothing revives.
   reducedMotion: {
     animations: {},
+  },
+  // ─── Done scene — "Engraved Inscription" ───────────────────────────
+  // The slab is preserved. Title eyebrow holds. The timer is replaced
+  // by the event title cut into the stone with the same engraved-digit
+  // shadow. A small tracked inscription kicker sits beneath, then the
+  // CTA pill. The whole ambient stack (slab/cool/rim/plinth/grain/
+  // vignette) is reused verbatim with the same ids so the rim flare
+  // selector keyed on #bg-rim-light continues to address the right
+  // node at done.
+  doneLayout: {
+    id: 'root',
+    type: 'group',
+    classes: {
+      className: {
+        base: 'relative min-h-screen w-full grid place-items-center overflow-hidden isolate bg-[color:var(--ct-color-bg)] px-4 py-10',
+        md: 'md:px-8 md:py-16',
+      },
+    },
+    children: [
+      {
+        id: 'bg-slab',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'absolute inset-0 -z-30 [background:var(--ct-effect-slab)]',
+          },
+        },
+      },
+      {
+        id: 'bg-cool-wash',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-0 -z-22 [background:var(--ct-effect-cool-wash)] [filter:blur(40px)]',
+          },
+        },
+      },
+      {
+        id: 'bg-rim-light',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-0 -z-18 [background:var(--ct-effect-rim-light)] [filter:blur(24px)] [will-change:transform,opacity,filter]',
+            md: 'md:[filter:blur(36px)]',
+          },
+        },
+      },
+      {
+        id: 'bg-plinth',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-x-0 bottom-0 h-[60%] -z-16 [background:var(--ct-effect-plinth)]',
+          },
+        },
+      },
+      {
+        id: 'bg-grain',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-0 -z-14 opacity-[0.18] mix-blend-overlay [background:var(--ct-effect-grain)] [background-size:6px_6px,11px_11px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_85%)]',
+          },
+        },
+      },
+      {
+        id: 'bg-vignette',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-0 -z-10 [background:radial-gradient(ellipse_at_center,transparent_50%,rgba(0,0,0,0.6)_100%)]',
+          },
+        },
+      },
+
+      // ─── Foreground — engraved eyebrow, hero inscription, kicker, CTA.
+      {
+        id: 'win-stack',
+        type: 'group',
+        classes: {
+          className: {
+            base: 'relative flex flex-col items-center gap-5 text-center w-full max-w-[min(98vw,80rem)]',
+            md: 'md:gap-7',
+          },
+        },
+        children: [
+          // Engraved eyebrow — same recipe as live (recessed shadow).
+          {
+            id: 'title',
+            type: 'event-title',
+            props: { source: 'title' },
+            vars: {
+              base: {
+                'ct-tracking-title': '0.48em',
+                'ct-weight-title': '600',
+                'ct-color-title': 'var(--ct-color-title)',
+                'ct-text-shadow': 'var(--ct-effect-engraved-title)',
+              },
+              md: {
+                'ct-tracking-title': '0.62em',
+                'ct-weight-title': '600',
+                'ct-color-title': 'var(--ct-color-title)',
+                'ct-text-shadow': 'var(--ct-effect-engraved-title)',
+              },
+            },
+            classes: {
+              className: {
+                base: 'uppercase pl-[0.48em] [text-shadow:var(--ct-effect-engraved-title)]',
+              },
+            },
+          },
+          // Hero — event title cut into the stone at digit weight/scale.
+          // Sourced from subtitle so the eyebrow above (title) and the
+          // hero below (subtitle) carry the two pieces of event copy.
+          // If the schema later exposes a primary slot we can swap.
+          {
+            id: 'win-hero',
+            type: 'event-title',
+            props: { source: 'subtitle' },
+            classes: { className: { base: 'mo-win-hero' } },
+          },
+          // Inscription kicker — small tracked engraved line. Text
+          // supplied by .mo-win-inscription::before; empty background
+          // div carries it.
+          {
+            id: 'win-inscription',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: { className: { base: 'mo-win-inscription' } },
+          },
+          // CTA pill — bone-on-graphite, hairline amber border.
+          {
+            id: 'win-cta',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: {
+              className: { base: 'mo-win-cta select-none inline-block mt-2' },
+            },
+          },
+        ],
+      },
+    ],
   },
 }
