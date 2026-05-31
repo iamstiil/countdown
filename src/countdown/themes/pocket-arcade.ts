@@ -472,6 +472,211 @@ export const pocketArcadeTheme: CountdownTheme = {
         animation: pa-flicker 0.8s infinite;
       }
     `,
+    // ─── Done scene — "Win Screen Composite" ─────────────────────────
+    //
+    // Staged 2s choreography (then settle, no infinite loops):
+    //   t=0      cabinet flicker + one final split-flap cascade on digits
+    //   t=200    marquee text crossfades to "NEW HIGH SCORE!"
+    //   t=400    screen content swaps: mascot avatar + hero title + stat
+    //   t=900    button row chain-reaction lights left→right (480ms)
+    //   t=1400   CTA pill slides up from below and receives focus
+    //   t=2000   short one-shot fireworks burst, fades by t=3500
+    //
+    // Reduced motion stamps the t=2000 frame directly: no flicker, no
+    // cascade, no fireworks, full CTA + lit buttons + hero text.
+    done: `
+      /* (1) Cabinet flicker — one-shot 320ms, not the infinite pa-flicker. */
+      [data-ct-theme="pocket-arcade"][data-state="done"] .pa-screen {
+        animation: pa-done-flicker 320ms steps(4, end);
+      }
+      @keyframes pa-done-flicker {
+        0%, 100% { filter: brightness(1); }
+        25%      { filter: brightness(1.4); }
+        50%      { filter: brightness(0.7); }
+        75%      { filter: brightness(1.2); }
+      }
+
+      /* Override the live state's infinite marquee flicker — done uses
+         a one-shot swell instead. */
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="event-title"][data-source="title"] {
+        animation: pa-marquee-swell 520ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+        font-size: clamp(1.3rem, 5vw, 2.4rem);
+      }
+      @keyframes pa-marquee-swell {
+        0%   { transform: scale(0.96); filter: brightness(0.8); }
+        60%  { transform: scale(1.08); filter: brightness(1.5); }
+        100% { transform: scale(1);    filter: brightness(1.15); }
+      }
+
+      /* (3) Hero event title inside the cabinet — magenta with cyan halo. */
+      [data-ct-theme="pocket-arcade"] .pa-win-hero {
+        font-family: var(--ct-font-display);
+        font-size: clamp(1rem, 5vw, 2.4rem);
+        line-height: 1.1;
+        letter-spacing: 0.06em;
+        text-align: center;
+        color: #ff3ea5;
+        text-shadow:
+          0 0 8px rgba(255, 62, 165, 0.9),
+          0 0 20px rgba(64, 224, 255, 0.55),
+          0 0 36px rgba(64, 224, 255, 0.3);
+        opacity: 0;
+        transform: translateY(8px);
+        animation: pa-pop-in 360ms cubic-bezier(0.22, 1, 0.36, 1) 400ms forwards;
+        position: relative;
+        z-index: 4;
+      }
+
+      /* Stat line — "YOU WAITED <duration>" in pixel mono. */
+      [data-ct-theme="pocket-arcade"] .pa-win-stat {
+        font-family: var(--ct-font-label);
+        font-size: clamp(0.5rem, 1.2vw, 0.65rem);
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: #b8b3c2;
+        text-align: center;
+        opacity: 0;
+        animation: pa-pop-in 360ms ease-out 700ms forwards;
+        position: relative;
+        z-index: 4;
+      }
+      [data-ct-theme="pocket-arcade"] .pa-win-stat::before {
+        content: "★ YOU WAITED · GG ★";
+        color: #ffe066;
+      }
+
+      /* Mascot avatar bottom-left of the cabinet — uses the existing
+         octopus pixel-art treatment. */
+      [data-ct-theme="pocket-arcade"] .pa-win-avatar {
+        position: absolute;
+        left: 1rem;
+        bottom: 1rem;
+        width: 32px;
+        height: 32px;
+        image-rendering: pixelated;
+        background:
+          radial-gradient(circle at 50% 40%, #ff3ea5 0%, #ff3ea5 40%, transparent 41%),
+          radial-gradient(circle at 35% 35%, #fff 0 12%, transparent 13%),
+          radial-gradient(circle at 65% 35%, #fff 0 12%, transparent 13%),
+          radial-gradient(circle at 35% 38%, #1b181d 0 5%, transparent 6%),
+          radial-gradient(circle at 65% 38%, #1b181d 0 5%, transparent 6%);
+        opacity: 0;
+        animation:
+          pa-pop-in 320ms cubic-bezier(0.34, 1.56, 0.64, 1) 480ms forwards,
+          pa-mascot-bob 3.4s ease-in-out 800ms infinite;
+        z-index: 4;
+      }
+
+      @keyframes pa-pop-in {
+        0%   { opacity: 0; transform: translateY(8px) scale(0.92); }
+        100% { opacity: 1; transform: translateY(0)   scale(1); }
+      }
+
+      /* (4) Button row chain-reaction — left→right cascade then settle.
+         Buttons stay "on" after the cascade so the visual is preserved. */
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span {
+        animation: pa-btn-cascade 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      }
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span:nth-child(1) { animation-delay: 900ms; }
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span:nth-child(2) { animation-delay: 960ms; }
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span:nth-child(3) { animation-delay: 1020ms; }
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span:nth-child(4) { animation-delay: 1080ms; }
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span:nth-child(5) { animation-delay: 1140ms; }
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span:nth-child(6) { animation-delay: 1200ms; }
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span:nth-child(7) { animation-delay: 1260ms; }
+      [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span:nth-child(8) { animation-delay: 1320ms; }
+      @keyframes pa-btn-cascade {
+        0%   { transform: translateY(2px) scale(0.92); filter: brightness(0.8); }
+        60%  { transform: translateY(-2px) scale(1.12); filter: brightness(1.6); }
+        100% { transform: translateY(0)   scale(1);    filter: brightness(1); }
+      }
+
+      /* (5) CTA pill — yellow arcade button "PRESS START →". Slides up
+         from below the cabinet and receives focus. */
+      [data-ct-theme="pocket-arcade"] .pa-win-cta {
+        font-family: var(--ct-font-display);
+        font-size: clamp(0.75rem, 1.6vw, 0.95rem);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #1b181d;
+        padding: 0.9rem 1.6rem;
+        border: none;
+        border-radius: 999px;
+        background:
+          radial-gradient(ellipse 100% 200% at 50% 130%, rgba(255, 224, 102, 0.65), transparent 60%),
+          linear-gradient(180deg, #ffe066 0%, #ffb84d 100%);
+        box-shadow:
+          inset 0 0 0 2px #b8862a,
+          inset 0 0 0 4px #ffeb99,
+          0 0 28px rgba(255, 184, 77, 0.55),
+          0 8px 22px rgba(0,0,0,0.5);
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(24px);
+        animation: pa-cta-rise 420ms cubic-bezier(0.34, 1.56, 0.64, 1) 1400ms forwards;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+      }
+      [data-ct-theme="pocket-arcade"] .pa-win-cta::before { content: "PRESS START ▸"; }
+      [data-ct-theme="pocket-arcade"] .pa-win-cta:hover,
+      [data-ct-theme="pocket-arcade"] .pa-win-cta:focus-visible {
+        transform: translateY(-2px);
+        outline: none;
+        box-shadow:
+          inset 0 0 0 2px #b8862a,
+          inset 0 0 0 4px #ffeb99,
+          0 0 40px rgba(255, 184, 77, 0.85),
+          0 12px 28px rgba(0,0,0,0.6);
+      }
+      [data-ct-theme="pocket-arcade"] .pa-win-cta:active {
+        transform: translateY(1px);
+        box-shadow:
+          inset 0 0 0 2px #b8862a,
+          inset 0 0 0 4px #ffeb99,
+          0 0 18px rgba(255, 184, 77, 0.5),
+          0 3px 8px rgba(0,0,0,0.5);
+      }
+      @keyframes pa-cta-rise {
+        0%   { opacity: 0; transform: translateY(24px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      /* (6) Fireworks burst — fades to invisible after 1.5s so it
+         doesn't loop indefinitely on every secondTick. The effect-layer
+         keeps spawning under the hood; this just hides its canvas. */
+      [data-ct-theme="pocket-arcade"] .pa-win-fireworks {
+        animation: pa-fireworks-fade 3500ms ease-out 2000ms forwards;
+        opacity: 0;
+      }
+      @keyframes pa-fireworks-fade {
+        0%   { opacity: 0; }
+        15%  { opacity: 1; }
+        60%  { opacity: 0.8; }
+        100% { opacity: 0; }
+      }
+
+      /* Reduced motion: stamp the final frame, no choreography. */
+      @media (prefers-reduced-motion: reduce) {
+        [data-ct-theme="pocket-arcade"][data-state="done"] .pa-screen,
+        [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="event-title"][data-source="title"],
+        [data-ct-theme="pocket-arcade"] .pa-win-hero,
+        [data-ct-theme="pocket-arcade"] .pa-win-stat,
+        [data-ct-theme="pocket-arcade"] .pa-win-avatar,
+        [data-ct-theme="pocket-arcade"] .pa-win-cta,
+        [data-ct-theme="pocket-arcade"][data-state="done"] [data-slot="progress"][data-kind="segments"] > span {
+          animation: none;
+        }
+        [data-ct-theme="pocket-arcade"] .pa-win-hero,
+        [data-ct-theme="pocket-arcade"] .pa-win-stat,
+        [data-ct-theme="pocket-arcade"] .pa-win-avatar,
+        [data-ct-theme="pocket-arcade"] .pa-win-cta {
+          opacity: 1;
+          transform: none;
+        }
+        [data-ct-theme="pocket-arcade"] .pa-win-fireworks {
+          display: none;
+        }
+      }
+    `,
   },
   layout: {
     id: 'root',
@@ -725,54 +930,118 @@ export const pocketArcadeTheme: CountdownTheme = {
       },
     ],
   },
-  // Phase 3 — T-zero scene: win jingle (audio binding), pixel-fireworks
-  // burst, and the marquee reveals the event title in bigger letters.
+  // Phase 3 — T-zero scene: "Win Screen Composite". Stages a 2s
+  // choreography that reuses the cabinet, marquee, button row, mascots,
+  // and fireworks; adds a stat line and a primary CTA. Reduced motion
+  // stamps the final frame (see the `done` rules in `animations`).
   doneLayout: {
     id: 'done-root',
     type: 'group',
     classes: {
       className: {
         base: 'relative min-h-screen w-full flex flex-col items-center justify-center gap-6 px-4 py-10 overflow-hidden',
+        md: 'md:gap-8 md:px-10 md:py-16',
       },
     },
     children: [
-      // Pixel-fireworks fills the screen.
+      // One-shot fireworks burst — sits behind everything, fades by t≈3.5s.
       {
         id: 'fireworks',
         type: 'effect-layer',
         props: {
           effect: 'crt-fireworks',
-          // Phase 4 — burst on every second tick post-zero for a steady
-          // celebratory loop.
+          // Keep the trigger so the burst restarts on a few early ticks
+          // for density; CSS fade-out caps the visual duration regardless.
           trigger: 'secondTick',
           options: {
             palette: ['#ff3ea5', '#40e0ff', '#ffe066', '#5dffb0', '#ffffff'],
           },
         },
-        classes: { className: { base: 'absolute inset-0 z-20' } },
+        classes: {
+          className: { base: 'pa-win-fireworks absolute inset-0 z-20' },
+        },
       },
+      // Marquee — same slot as live, but the `done` rules swell it once.
       {
-        id: 'win-title',
+        id: 'win-marquee',
         type: 'event-title',
         props: { source: 'title' },
-        classes: { className: { base: 'relative z-30' } },
+        classes: {
+          className: {
+            base: 'relative z-30 w-full max-w-[min(94vw,40rem)] text-center',
+          },
+        },
       },
+      // Cabinet — preserved as the artefact. Inside: hero title + stat
+      // line + mascot avatar. The original split-flap timer is replaced
+      // here so the cabinet shows the "win" content rather than 00:00.
       {
         id: 'win-cabinet',
         type: 'group',
         classes: {
           className: {
             base: 'pa-screen relative w-full max-w-[min(94vw,40rem)] flex flex-col items-center justify-center gap-3 py-12 z-30',
+            md: 'md:gap-4 md:py-16',
           },
         },
         children: [
+          // Halation glow behind the screen (same as live).
           {
-            id: 'win-subtitle',
+            id: 'win-halo',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: { className: { base: 'pa-halo' } },
+          },
+          // Mascot avatar — pixel octopus, bottom-left corner of the cabinet.
+          {
+            id: 'win-avatar',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: { className: { base: 'pa-win-avatar' } },
+          },
+          // Hero event title in magenta with cyan halo.
+          {
+            id: 'win-hero',
             type: 'event-title',
             props: { source: 'subtitle' },
-            classes: { className: { base: 'relative z-[4] text-center' } },
+            classes: { className: { base: 'pa-win-hero' } },
+          },
+          // Stat line — "★ YOU WAITED · GG ★" in pixel mono.
+          // Text supplied via .pa-win-stat::before so an empty background
+          // slot div carries it (no slot type for free-form text).
+          {
+            id: 'win-stat',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: { className: { base: 'pa-win-stat' } },
           },
         ],
+      },
+      // Arcade button row — chain-reactions left→right after the marquee
+      // swell, then holds lit. Uses the same segmented progress slot as
+      // live so the existing candy color rules apply.
+      {
+        id: 'win-buttons',
+        type: 'progress',
+        props: { kind: 'segments', direction: 'elapsed' },
+        classes: {
+          className: {
+            base: 'relative z-30 w-full max-w-[min(94vw,40rem)]',
+          },
+        },
+      },
+      // CTA pill — yellow arcade button. Slides up from below the cabinet
+      // and receives focus. Text in .pa-win-cta::before; the empty
+      // background slot div provides the box.
+      {
+        id: 'win-cta',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pa-win-cta relative z-30 select-none inline-block',
+          },
+        },
       },
     ],
   },
