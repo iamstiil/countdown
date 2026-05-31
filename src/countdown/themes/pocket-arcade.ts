@@ -150,13 +150,19 @@ export const pocketArcadeTheme: CountdownTheme = {
           inset 0 0 60px rgba(0,0,0,0.75),
           0 24px 60px -16px rgba(0,0,0,0.7),
           0 0 0 1px #0a080c;
-        overflow: hidden;
+        /* overflow stays visible so the digits' phosphor glow (text-shadow)
+           can bleed past the bezel like a real CRT. The scanline and glare
+           pseudo-elements clip themselves to the rounded screen shape via
+           border-radius: inherit, and the screen's own background is
+           naturally clipped to the rounded border-box. */
+        overflow: visible;
         isolation: isolate;
       }
       /* Subtle phosphor burn-in tinted ghost behind the digits. */
       [data-ct-theme="pocket-arcade"] .pa-screen::before {
         content: "";
         position: absolute; inset: 0;
+        border-radius: inherit;
         background:
           repeating-linear-gradient(
             to bottom,
@@ -172,6 +178,7 @@ export const pocketArcadeTheme: CountdownTheme = {
       [data-ct-theme="pocket-arcade"] .pa-screen::after {
         content: "";
         position: absolute; inset: 0;
+        border-radius: inherit;
         background:
           radial-gradient(
             ellipse 90% 40%

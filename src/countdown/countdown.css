@@ -285,8 +285,12 @@
 
 /* split-flap — outgoing top half drops away, incoming bottom half rises.
    Rendered via two pseudo-elements that read the current and previous chars
-   from data attributes. Stepped easing gives the mechanical pixel feel. */
-[data-ct-theme] [data-value][data-transition='split-flap'] [data-digit] {
+   from data attributes. Stepped easing gives the mechanical pixel feel.
+   Only the actively changing digit needs to clip the ±110% translate; a
+   resting digit stays overflow:visible so its glow (text-shadow) can bleed. */
+[data-ct-theme]
+  [data-value][data-transition='split-flap']
+  [data-digit][data-changing='true'] {
   overflow: hidden;
 }
 [data-ct-theme]
@@ -330,8 +334,11 @@
 }
 
 /* odometer — incoming digit slides up from below, outgoing slides up and
-   out the top, both via a single character cell. */
-[data-ct-theme] [data-value][data-transition='odometer'] [data-digit] {
+   out the top, both via a single character cell. As with split-flap, only
+   the actively changing digit clips so resting digits can glow freely. */
+[data-ct-theme]
+  [data-value][data-transition='odometer']
+  [data-digit][data-changing='true'] {
   overflow: hidden;
 }
 [data-ct-theme]

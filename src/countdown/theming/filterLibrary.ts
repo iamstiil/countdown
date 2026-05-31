@@ -56,8 +56,13 @@ export const builtInFilters: Record<BuiltInFilterId, string> = {
 
   // Chromatic aberration: split RGB channels by ~1px and recombine.
   // Cheap, looks great over text.
+  // Region is generous (x=-25% y=-100% w=150% h=300%) so that text-shadow
+  // halos drawn on the source — common on glow/neon styling — survive the
+  // SVG filter pipeline. SVG filters clip output to the filter region;
+  // the default 10% margin (or this filter's older 2%) was cropping the
+  // bloom flat at the top of glyphs.
   'chromatic-aberration': `
-    <filter id="ct-chromatic-aberration" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
+    <filter id="ct-chromatic-aberration" x="-25%" y="-100%" width="150%" height="300%" color-interpolation-filters="sRGB">
       <feOffset in="SourceGraphic" dx="-0.6" dy="0" result="r" />
       <feOffset in="SourceGraphic" dx="0.6" dy="0" result="b" />
       <feColorMatrix in="r" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="rOnly" />
