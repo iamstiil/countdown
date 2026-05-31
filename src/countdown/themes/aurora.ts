@@ -127,6 +127,166 @@ export const auroraTheme: CountdownTheme = {
     // gradient flows along the bar like the ribbons above.
     'aurora-flow':
       '@keyframes ct-aurora-flow{from{background-position:0% 50%}to{background-position:200% 50%}}',
+    // ─── Done scene — "Aurora Apex" ──────────────────────────────────
+    //
+    // The ribbons crest. One synchronized swell to full saturation and
+    // centerline, then settle 30% calmer than the live drift. Title
+    // promotes to hero scale + rim glow; a single CTA pill rises.
+    //
+    //   t=0     ribbons swell — duration drops to a one-shot 2.4s cycle
+    //           pulling both bands toward the vertical centerline at
+    //           full saturation; bloom brightens 0.75 → 1.15
+    //   t=400   hero title scales in (1 → 1.0) with rim glow
+    //   t=900   "It begins now." sub fades up
+    //   t=1400  CTA pill rises and receives focus
+    //   t=2400  ribbons resume calm drift (32s, opacity 0.7)
+    //
+    // Pure existing tokens; no new effects. Reduced motion stamps the
+    // post-swell calm frame directly.
+    done: `
+      /* (1) Ribbon crest — both bands swell to full saturation, pull
+         toward the centerline, then settle calmer than live drift. */
+      [data-ct-theme="aurora"][data-state="done"] [data-slot="background"]#bg-aurora-a,
+      [data-ct-theme="aurora"][data-state="done"] [data-slot="background"]#bg-aurora-b {
+        animation:
+          ct-aurora-apex-a 2.4s cubic-bezier(0.22, 1, 0.36, 1) both,
+          ct-aurora-drift-a 32s ease-in-out 2.4s infinite;
+      }
+      [data-ct-theme="aurora"][data-state="done"] [data-slot="background"]#bg-aurora-b {
+        animation:
+          ct-aurora-apex-b 2.4s cubic-bezier(0.22, 1, 0.36, 1) both,
+          ct-aurora-drift-b 38s ease-in-out 2.4s infinite;
+        opacity: 0.7;
+      }
+      [data-ct-theme="aurora"][data-state="done"] [data-slot="background"]#bg-aurora-a {
+        opacity: 0.85;
+      }
+      @keyframes ct-aurora-apex-a {
+        0%   { transform: translate3d(-4%, 0, 0) skewY(-2deg) scale(1);    opacity: 0.85; filter: saturate(1.25) blur(28px); }
+        55%  { transform: translate3d(0, -4%, 0) skewY(0deg) scale(1.18); opacity: 1;    filter: saturate(1.9) blur(20px); }
+        100% { transform: translate3d(-2%, -1%, 0) skewY(-1deg) scale(1.04); opacity: 0.75; filter: saturate(1.3) blur(30px); }
+      }
+      @keyframes ct-aurora-apex-b {
+        0%   { transform: translate3d(5%, 1%, 0) skewY(2deg) scale(1);    opacity: 0.7; filter: saturate(1.2) blur(34px); }
+        55%  { transform: translate3d(0, 3%, 0) skewY(0deg) scale(1.15); opacity: 0.95; filter: saturate(1.7) blur(26px); }
+        100% { transform: translate3d(3%, 0%, 0) skewY(1deg) scale(1.03); opacity: 0.65; filter: saturate(1.25) blur(36px); }
+      }
+
+      /* Bloom swells with the ribbons. */
+      [data-ct-theme="aurora"][data-state="done"] [data-slot="background"]#bg-bloom {
+        animation: ct-aurora-apex-bloom 2.4s ease-out both;
+      }
+      @keyframes ct-aurora-apex-bloom {
+        0%   { opacity: 0.75; filter: blur(20px); }
+        55%  { opacity: 1.15; filter: blur(10px); }
+        100% { opacity: 0.6;  filter: blur(22px); }
+      }
+
+      /* (2) Hero event title — scales in with full rim glow. */
+      [data-ct-theme="aurora"] .au-win-hero {
+        font-family: var(--ct-font-display);
+        font-weight: 500;
+        font-size: clamp(1.8rem, 7vw, 4.5rem);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        text-align: center;
+        color: var(--ct-color-fg);
+        text-shadow:
+          0 0 18px color-mix(in oklab, var(--ct-color-rim), transparent 45%),
+          0 0 48px color-mix(in oklab, var(--ct-color-accent), transparent 60%),
+          0 0 96px color-mix(in oklab, var(--ct-color-secondary), transparent 70%);
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+        animation: au-hero-in 720ms cubic-bezier(0.22, 1, 0.36, 1) 400ms forwards;
+      }
+      @keyframes au-hero-in {
+        0%   { opacity: 0; transform: translateY(12px) scale(0.96); }
+        100% { opacity: 1; transform: translateY(0)    scale(1); }
+      }
+
+      /* (3) Subtitle whisper. */
+      [data-ct-theme="aurora"] .au-win-sub {
+        font-family: var(--ct-font-display);
+        font-weight: 300;
+        font-style: italic;
+        font-size: clamp(1rem, 1.8vw, 1.25rem);
+        letter-spacing: 0.02em;
+        text-align: center;
+        color: color-mix(in oklab, var(--ct-color-fg), transparent 45%);
+        opacity: 0;
+        animation: au-fade-up 520ms ease-out 900ms forwards;
+      }
+      [data-ct-theme="aurora"] .au-win-sub::before { content: "It begins now."; }
+
+      @keyframes au-fade-up {
+        0%   { opacity: 0; transform: translateY(8px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      /* (4) CTA pill — rises last, receives focus. Glassy fill that
+         picks up the ribbon palette via color-mix. */
+      [data-ct-theme="aurora"] .au-win-cta {
+        font-family: var(--ct-font-display);
+        font-weight: 500;
+        font-size: clamp(0.85rem, 1.5vw, 1rem);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ct-color-fg);
+        padding: 0.95rem 1.8rem;
+        border: 1px solid color-mix(in oklab, var(--ct-color-rim), transparent 50%);
+        border-radius: 999px;
+        background:
+          linear-gradient(180deg,
+            color-mix(in oklab, var(--ct-color-accent), transparent 78%) 0%,
+            color-mix(in oklab, var(--ct-color-secondary), transparent 82%) 100%);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow:
+          0 0 24px color-mix(in oklab, var(--ct-color-accent), transparent 65%),
+          0 0 64px color-mix(in oklab, var(--ct-color-secondary), transparent 80%),
+          inset 0 1px 0 color-mix(in oklab, white, transparent 70%);
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(16px);
+        animation: au-cta-rise 540ms cubic-bezier(0.22, 1, 0.36, 1) 1400ms forwards;
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      }
+      [data-ct-theme="aurora"] .au-win-cta::before { content: "Open the experience ▸"; }
+      [data-ct-theme="aurora"] .au-win-cta:hover,
+      [data-ct-theme="aurora"] .au-win-cta:focus-visible {
+        transform: translateY(-2px);
+        outline: none;
+        border-color: color-mix(in oklab, var(--ct-color-rim), transparent 20%);
+        box-shadow:
+          0 0 36px color-mix(in oklab, var(--ct-color-accent), transparent 50%),
+          0 0 96px color-mix(in oklab, var(--ct-color-secondary), transparent 70%),
+          inset 0 1px 0 color-mix(in oklab, white, transparent 60%);
+      }
+      [data-ct-theme="aurora"] .au-win-cta:active { transform: translateY(0); }
+
+      @keyframes au-cta-rise {
+        0%   { opacity: 0; transform: translateY(16px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Reduced motion: stamp the post-swell calm frame, no choreography. */
+      @media (prefers-reduced-motion: reduce) {
+        [data-ct-theme="aurora"][data-state="done"] [data-slot="background"]#bg-aurora-a,
+        [data-ct-theme="aurora"][data-state="done"] [data-slot="background"]#bg-aurora-b,
+        [data-ct-theme="aurora"][data-state="done"] [data-slot="background"]#bg-bloom,
+        [data-ct-theme="aurora"] .au-win-hero,
+        [data-ct-theme="aurora"] .au-win-sub,
+        [data-ct-theme="aurora"] .au-win-cta {
+          animation: none;
+        }
+        [data-ct-theme="aurora"] .au-win-hero,
+        [data-ct-theme="aurora"] .au-win-sub,
+        [data-ct-theme="aurora"] .au-win-cta {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    `,
   },
   layout: {
     id: 'root',
@@ -377,5 +537,136 @@ export const auroraTheme: CountdownTheme = {
   // them.
   reducedMotion: {
     animations: {},
+  },
+  // ─── Done scene — "Aurora Apex" ─────────────────────────────────────
+  // Reuses every sky layer unchanged; swaps the foreground stack so the
+  // event title is promoted to hero scale, a single subtitle whispers,
+  // and a glassy ribbon-tinted CTA pill rises. The ribbon crest itself
+  // lives in `animations.done` above.
+  doneLayout: {
+    id: 'root',
+    type: 'group',
+    classes: {
+      className: {
+        base: 'relative min-h-screen w-full grid place-items-center overflow-hidden isolate bg-[color:var(--ct-color-bg)] p-4 md:p-8',
+      },
+    },
+    children: [
+      // ─── Sky stack — identical to live so the apex animations have
+      //     the same targets to address. Ids preserved.
+      {
+        id: 'bg-sky',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'absolute inset-0 -z-30 [background:radial-gradient(ellipse_80%_60%_at_50%_15%,color-mix(in_oklab,var(--ct-color-secondary),var(--ct-color-bg)_82%)_0%,var(--ct-color-bg)_60%),linear-gradient(180deg,var(--ct-color-bg)_0%,#02030c_100%)]',
+          },
+        },
+      },
+      {
+        id: 'bg-stars',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-0 -z-22 opacity-[0.55] [background-image:radial-gradient(circle_at_1px_1px,color-mix(in_oklab,white,transparent_15%)_0.6px,transparent_1.2px),radial-gradient(circle_at_1px_1px,color-mix(in_oklab,white,transparent_55%)_0.4px,transparent_1px)] [background-size:120px_120px,60px_60px] [background-position:0_0,30px_45px] [mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_85%)] motion-safe:[animation:ct-aurora-twinkle_6s_ease-in-out_infinite]',
+          },
+        },
+      },
+      {
+        id: 'bg-aurora-a',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-x-[-15%] top-[10%] bottom-[20%] -z-18 mix-blend-screen [background:var(--ct-effect-aurora-a)] [filter:blur(28px)_saturate(125%)] [will-change:transform,opacity]',
+            md: 'md:[filter:blur(40px)_saturate(130%)]',
+          },
+        },
+      },
+      {
+        id: 'bg-aurora-b',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-x-[-15%] top-[0%] bottom-[35%] -z-16 mix-blend-screen [background:var(--ct-effect-aurora-b)] [filter:blur(34px)_saturate(120%)] [will-change:transform,opacity]',
+            md: 'md:[filter:blur(48px)_saturate(125%)]',
+          },
+        },
+      },
+      {
+        id: 'bg-bloom',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-0 -z-14 mix-blend-screen [background:var(--ct-effect-bloom)] [filter:blur(20px)]',
+          },
+        },
+      },
+      {
+        id: 'bg-mist',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-x-0 bottom-0 h-[42%] -z-12 [background:linear-gradient(to_top,color-mix(in_oklab,var(--ct-color-accent),var(--ct-color-bg)_82%)_0%,transparent_100%)] opacity-[0.55]',
+          },
+        },
+      },
+      {
+        id: 'bg-vignette',
+        type: 'background',
+        props: { kind: 'gradient' },
+        classes: {
+          className: {
+            base: 'pointer-events-none absolute inset-0 -z-10 [background:radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.55)_100%)]',
+          },
+        },
+      },
+
+      // ─── Foreground — hero title + whisper + CTA pill.
+      {
+        id: 'win-stack',
+        type: 'group',
+        classes: {
+          className: {
+            base: 'relative flex flex-col items-center gap-5 text-center w-full max-w-[min(94vw,46rem)]',
+            md: 'md:gap-7',
+          },
+        },
+        children: [
+          // Hero event title — promoted scale, full rim glow. Empty
+          // background slot div carries the .au-win-hero class which
+          // pulls the actual title from props via the slot's text.
+          // We reuse the event-title slot so the runtime fills text.
+          {
+            id: 'win-hero',
+            type: 'event-title',
+            props: { source: 'title' },
+            classes: { className: { base: 'au-win-hero' } },
+          },
+          // Subtitle whisper — text supplied by .au-win-sub::before so
+          // an empty background div can carry it without a slot type.
+          {
+            id: 'win-sub',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: { className: { base: 'au-win-sub' } },
+          },
+          // CTA pill — text via .au-win-cta::before.
+          {
+            id: 'win-cta',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: {
+              className: { base: 'au-win-cta select-none inline-block mt-2' },
+            },
+          },
+        ],
+      },
+    ],
   },
 }
