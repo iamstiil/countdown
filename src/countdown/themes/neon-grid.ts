@@ -192,7 +192,7 @@ export const neonGridTheme: CountdownTheme = {
         text-shadow: var(--ct-effect-glow);
         opacity: 0;
         transform: translateY(8px);
-        animation: ng-hero-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) 320ms forwards;
+        animation: ng-hero-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) 320ms both;
         text-align: center;
       }
       [data-ct-theme="neon-grid"] .ng-hero::before {
@@ -221,13 +221,13 @@ export const neonGridTheme: CountdownTheme = {
       [data-ct-theme="neon-grid"] .ng-boot-2::before { content: "> handshake ok"; }
       [data-ct-theme="neon-grid"] .ng-boot-3::before { content: "> SYS://LIVE"; }
       [data-ct-theme="neon-grid"][data-state="done"] .ng-boot-1 {
-        animation: ng-type 520ms steps(28, end) 900ms forwards;
+        animation: ng-type 520ms steps(28, end) 900ms both;
       }
       [data-ct-theme="neon-grid"][data-state="done"] .ng-boot-2 {
-        animation: ng-type 420ms steps(20, end) 1500ms forwards;
+        animation: ng-type 420ms steps(20, end) 1500ms both;
       }
       [data-ct-theme="neon-grid"][data-state="done"] .ng-boot-3 {
-        animation: ng-type 380ms steps(16, end) 2000ms forwards;
+        animation: ng-type 380ms steps(16, end) 2000ms both;
         color: var(--ct-color-secondary);
         text-shadow: 0 0 12px color-mix(in oklab, var(--ct-color-secondary), transparent 60%);
       }
@@ -255,7 +255,7 @@ export const neonGridTheme: CountdownTheme = {
           0 0 0 1px color-mix(in oklab, var(--ct-color-accent), transparent 75%) inset,
           0 0 22px color-mix(in oklab, var(--ct-color-accent), transparent 70%);
         opacity: 0;
-        animation: ng-hero-in 380ms ease-out 2400ms forwards;
+        animation: ng-hero-in 380ms ease-out 2400ms both;
         cursor: pointer;
         transition: background 160ms ease, box-shadow 160ms ease;
       }

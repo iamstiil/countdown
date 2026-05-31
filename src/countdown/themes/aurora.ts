@@ -197,7 +197,7 @@ export const auroraTheme: CountdownTheme = {
           0 0 96px color-mix(in oklab, var(--ct-color-secondary), transparent 70%);
         opacity: 0;
         transform: translateY(12px) scale(0.96);
-        animation: au-hero-in 720ms cubic-bezier(0.22, 1, 0.36, 1) 400ms forwards;
+        animation: au-hero-in 720ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
       }
       @keyframes au-hero-in {
         0%   { opacity: 0; transform: translateY(12px) scale(0.96); }
@@ -214,7 +214,7 @@ export const auroraTheme: CountdownTheme = {
         text-align: center;
         color: color-mix(in oklab, var(--ct-color-fg), transparent 45%);
         opacity: 0;
-        animation: au-fade-up 520ms ease-out 900ms forwards;
+        animation: au-fade-up 520ms ease-out 900ms both;
       }
       [data-ct-theme="aurora"] .au-win-sub::before { content: "It begins now."; }
 
@@ -248,7 +248,7 @@ export const auroraTheme: CountdownTheme = {
         cursor: pointer;
         opacity: 0;
         transform: translateY(16px);
-        animation: au-cta-rise 540ms cubic-bezier(0.22, 1, 0.36, 1) 1400ms forwards;
+        animation: au-cta-rise 540ms cubic-bezier(0.22, 1, 0.36, 1) 1400ms both;
         transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
       }
       [data-ct-theme="aurora"] .au-win-cta::before { content: "Open the experience ▸"; }

@@ -522,7 +522,7 @@ export const pocketArcadeTheme: CountdownTheme = {
           0 0 36px rgba(64, 224, 255, 0.3);
         opacity: 0;
         transform: translateY(8px);
-        animation: pa-pop-in 360ms cubic-bezier(0.22, 1, 0.36, 1) 400ms forwards;
+        animation: pa-pop-in 360ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
         position: relative;
         z-index: 4;
       }
@@ -536,7 +536,7 @@ export const pocketArcadeTheme: CountdownTheme = {
         color: #b8b3c2;
         text-align: center;
         opacity: 0;
-        animation: pa-pop-in 360ms ease-out 700ms forwards;
+        animation: pa-pop-in 360ms ease-out 700ms both;
         position: relative;
         z-index: 4;
       }
@@ -562,7 +562,7 @@ export const pocketArcadeTheme: CountdownTheme = {
           radial-gradient(circle at 65% 38%, #1b181d 0 5%, transparent 6%);
         opacity: 0;
         animation:
-          pa-pop-in 320ms cubic-bezier(0.34, 1.56, 0.64, 1) 480ms forwards,
+          pa-pop-in 320ms cubic-bezier(0.34, 1.56, 0.64, 1) 480ms both,
           pa-mascot-bob 3.4s ease-in-out 800ms infinite;
         z-index: 4;
       }
@@ -613,7 +613,7 @@ export const pocketArcadeTheme: CountdownTheme = {
         cursor: pointer;
         opacity: 0;
         transform: translateY(24px);
-        animation: pa-cta-rise 420ms cubic-bezier(0.34, 1.56, 0.64, 1) 1400ms forwards;
+        animation: pa-cta-rise 420ms cubic-bezier(0.34, 1.56, 0.64, 1) 1400ms both;
         transition: transform 120ms ease, box-shadow 120ms ease;
       }
       [data-ct-theme="pocket-arcade"] .pa-win-cta::before { content: "PRESS START ▸"; }
@@ -644,7 +644,7 @@ export const pocketArcadeTheme: CountdownTheme = {
          doesn't loop indefinitely on every secondTick. The effect-layer
          keeps spawning under the hood; this just hides its canvas. */
       [data-ct-theme="pocket-arcade"] .pa-win-fireworks {
-        animation: pa-fireworks-fade 3500ms ease-out 2000ms forwards;
+        animation: pa-fireworks-fade 3500ms ease-out 2000ms both;
         opacity: 0;
       }
       @keyframes pa-fireworks-fade {

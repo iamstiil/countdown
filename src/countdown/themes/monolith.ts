@@ -186,7 +186,7 @@ export const monolithTheme: CountdownTheme = {
         text-shadow: var(--ct-effect-engraved-digit);
         opacity: 0;
         transform: translateY(6px);
-        animation: mo-cut-in 620ms cubic-bezier(0.22, 1, 0.36, 1) 200ms forwards;
+        animation: mo-cut-in 620ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
       }
       @keyframes mo-cut-in {
         0%   { opacity: 0; transform: translateY(6px); filter: blur(2px); }
@@ -208,7 +208,7 @@ export const monolithTheme: CountdownTheme = {
         text-shadow: var(--ct-effect-engraved-title);
         padding-left: 0.46em;
         opacity: 0;
-        animation: mo-fade-up 520ms ease-out 700ms forwards;
+        animation: mo-fade-up 520ms ease-out 700ms both;
       }
       [data-ct-theme="monolith"] .mo-win-inscription::before {
         content: "ARRIVED · MMXXVI";
@@ -254,7 +254,7 @@ export const monolithTheme: CountdownTheme = {
         cursor: pointer;
         opacity: 0;
         transform: translateY(10px);
-        animation: mo-cta-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) 1500ms forwards;
+        animation: mo-cta-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) 1500ms both;
         transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
       }
       [data-ct-theme="monolith"] .mo-win-cta::before { content: "Enter the gate ▸"; }

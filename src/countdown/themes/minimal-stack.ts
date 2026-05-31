@@ -253,7 +253,7 @@ export const minimalStackTheme: CountdownTheme = {
         color: var(--ct-color-fg);
         text-align: left;
         opacity: 0;
-        animation: ms-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) 220ms forwards;
+        animation: ms-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) 220ms both;
       }
       [data-ct-theme='minimal-stack'] .ms-hero::before { content: "NOW"; }
       [data-ct-theme='minimal-stack'] .ms-hero::after {
@@ -271,7 +271,7 @@ export const minimalStackTheme: CountdownTheme = {
         letter-spacing: -0.005em;
         margin-top: 0.25rem;
         opacity: 0;
-        animation: ms-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) 380ms forwards;
+        animation: ms-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both;
       }
       [data-ct-theme='minimal-stack'] .ms-flourish::before { content: "It’s time."; }
 
@@ -289,7 +289,7 @@ export const minimalStackTheme: CountdownTheme = {
         background: var(--ct-color-accent);
         width: 0;
         margin-top: 1.25rem;
-        animation: ms-rule-extend 720ms cubic-bezier(0.22, 1, 0.36, 1) 600ms forwards;
+        animation: ms-rule-extend 720ms cubic-bezier(0.22, 1, 0.36, 1) 600ms both;
         transform-origin: left center;
       }
       @keyframes ms-rule-extend {
@@ -309,7 +309,7 @@ export const minimalStackTheme: CountdownTheme = {
         font-weight: 500;
         color: var(--ct-color-muted);
         opacity: 0;
-        animation: ms-fade-up 420ms ease-out 1100ms forwards;
+        animation: ms-fade-up 420ms ease-out 1100ms both;
       }
 
       /* Closing link — body-set, italic underline. The CTA refuses
@@ -326,7 +326,7 @@ export const minimalStackTheme: CountdownTheme = {
         text-decoration-thickness: 1px;
         cursor: pointer;
         opacity: 0;
-        animation: ms-fade-up 420ms ease-out 1280ms forwards;
+        animation: ms-fade-up 420ms ease-out 1280ms both;
         transition: text-decoration-thickness 160ms ease;
       }
       [data-ct-theme='minimal-stack'] .ms-link::before { content: "Read the announcement →"; }

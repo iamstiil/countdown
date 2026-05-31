@@ -332,9 +332,11 @@ export const tideLettersTheme: CountdownTheme = {
       }
     `,
     done: `
-      /* T-zero scene: the tide overtakes the page. The doneLayout
-         repositions the event title as the floating word and lets the
-         watercolor-bloom effect-layer disperse the ink underneath. */
+      /* T-zero scene — "The Letter Arrives" ────────────────────────
+         The tide rises to fill the page; a single watercolor bloom
+         disperses the ink (capped — no longer infinite); the event
+         title floats up as the letterhead; a paper card with the
+         dispatch, signature, and CTA fades up onto the tide. */
       [data-ct-theme="tide-letters"][data-state="done"] .tl-pool {
         height: 100vh;
         animation-play-state: paused;
@@ -343,23 +345,173 @@ export const tideLettersTheme: CountdownTheme = {
       [data-ct-theme="tide-letters"][data-state="done"] .tl-grain {
         opacity: 0.25;
       }
+
+      /* Cap the watercolor-bloom canvas so it doesn't loop forever.
+         The effect-layer keeps refiring under the hood; this just
+         fades its visible output out by t≈2.4s. */
+      [data-ct-theme="tide-letters"][data-state="done"] [data-slot="effect-layer"] {
+        animation: tl-bloom-fade 2400ms ease-out 1200ms both;
+      }
+      @keyframes tl-bloom-fade {
+        0%   { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      /* Floating word — the letterhead. Sits above the card now. */
       [data-ct-theme="tide-letters"] .tl-float-word {
         font-family: var(--ct-font-subtitle, var(--ct-font-display));
         font-style: italic;
-        font-size: clamp(2rem, 6vw, 3.5rem);
+        font-size: clamp(1.6rem, 5vw, 3rem);
         color: var(--ct-color-fg);
         letter-spacing: 0;
         text-transform: none;
         text-align: center;
         opacity: 0;
         filter: var(--ct-effect-filter-watercolor, none);
-        animation: tl-float-up 4200ms cubic-bezier(0.22, 1, 0.36, 1) 600ms forwards;
+        animation: tl-float-up 3200ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both;
         max-width: 32ch;
       }
       @keyframes tl-float-up {
-        0%   { opacity: 0; transform: translateY(48px) scale(0.96); filter: blur(8px); }
+        0%   { opacity: 0;   transform: translateY(48px) scale(0.96); filter: blur(8px); }
         60%  { opacity: 0.95; transform: translateY(-6px) scale(1.02); filter: blur(1px); }
-        100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        100% { opacity: 1;   transform: translateY(0)    scale(1);    filter: blur(0); }
+      }
+
+      /* The paper card — the letter itself. Off-white parchment with
+         a deckle-soft border, sitting on the tide. */
+      [data-ct-theme="tide-letters"] .tl-letter {
+        position: relative;
+        max-width: min(92vw, 32rem);
+        margin-top: clamp(1rem, 3vw, 1.75rem);
+        padding: clamp(1.4rem, 3vw, 2rem) clamp(1.6rem, 4vw, 2.4rem);
+        background:
+          linear-gradient(180deg,
+            color-mix(in oklab, var(--ct-color-bg), #fff 8%) 0%,
+            color-mix(in oklab, var(--ct-color-bg), #fff 4%) 100%);
+        border: 1px solid color-mix(in oklab, var(--ct-color-fg), transparent 82%);
+        border-radius: 3px;
+        box-shadow:
+          0 1px 0 color-mix(in oklab, #fff, transparent 80%) inset,
+          0 18px 40px rgba(20, 35, 50, 0.22),
+          0 4px 14px rgba(20, 35, 50, 0.18);
+        text-align: left;
+        opacity: 0;
+        transform: translateY(18px);
+        animation: tl-letter-rise 720ms cubic-bezier(0.22, 1, 0.36, 1) 1100ms both;
+      }
+      /* Soft top edge fade so the card visually melts into the float-
+         word above; bottom edge meets the tideline. */
+      [data-ct-theme="tide-letters"] .tl-letter::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(180deg,
+            color-mix(in oklab, var(--ct-color-bg), #fff 6%) 0%,
+            transparent 8%,
+            transparent 92%,
+            color-mix(in oklab, var(--ct-color-fg), transparent 92%) 100%);
+        border-radius: inherit;
+      }
+      @keyframes tl-letter-rise {
+        0%   { opacity: 0; transform: translateY(18px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Dateline — tracked, small caps, muted. Text via ::before. */
+      [data-ct-theme="tide-letters"] .tl-letter-dateline {
+        font-family: var(--ct-font-label, var(--ct-font-display));
+        font-size: clamp(0.6rem, 1vw, 0.7rem);
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: color-mix(in oklab, var(--ct-color-fg), transparent 45%);
+        margin-bottom: 0.9rem;
+      }
+      [data-ct-theme="tide-letters"] .tl-letter-dateline::before {
+        content: "Dispatch · 31.V.MMXXVI";
+      }
+
+      /* Italic body line — the dispatch itself. */
+      [data-ct-theme="tide-letters"] .tl-letter-body {
+        font-family: var(--ct-font-subtitle, var(--ct-font-display));
+        font-style: italic;
+        font-size: clamp(0.98rem, 1.6vw, 1.15rem);
+        line-height: 1.55;
+        color: color-mix(in oklab, var(--ct-color-fg), transparent 8%);
+        margin: 0;
+      }
+
+      /* Signature line — handset script flourish on the right. */
+      [data-ct-theme="tide-letters"] .tl-letter-signature {
+        font-family: var(--ct-font-subtitle, var(--ct-font-display));
+        font-style: italic;
+        font-size: clamp(1rem, 1.6vw, 1.1rem);
+        text-align: right;
+        color: color-mix(in oklab, var(--ct-color-fg), transparent 25%);
+        margin-top: 1rem;
+      }
+      [data-ct-theme="tide-letters"] .tl-letter-signature::before {
+        content: "— with care, the tide";
+      }
+
+      /* CTA pill — quiet, parchment, with a moonstone underline. */
+      [data-ct-theme="tide-letters"] .tl-letter-cta {
+        display: inline-block;
+        margin-top: 1.4rem;
+        font-family: var(--ct-font-subtitle, var(--ct-font-display));
+        font-style: italic;
+        font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+        color: #2c6a6a;
+        padding: 0.55rem 0.1rem;
+        border: none;
+        border-bottom: 1.5px solid color-mix(in oklab, #5678a8, transparent 50%);
+        background: transparent;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(6px);
+        animation: tl-cta-rise 520ms ease-out 1800ms both;
+        transition: color 160ms ease, border-color 160ms ease, transform 160ms ease;
+      }
+      [data-ct-theme="tide-letters"] .tl-letter-cta::before {
+        content: "Open the letter →";
+      }
+      [data-ct-theme="tide-letters"] .tl-letter-cta:hover,
+      [data-ct-theme="tide-letters"] .tl-letter-cta:focus-visible {
+        outline: none;
+        color: #5678a8;
+        border-bottom-color: #5678a8;
+        transform: translateY(-1px);
+      }
+      [data-ct-theme="tide-letters"] .tl-letter-cta:focus-visible {
+        outline: 2px solid color-mix(in oklab, #5678a8, transparent 40%);
+        outline-offset: 4px;
+        border-radius: 2px;
+      }
+      @keyframes tl-cta-rise {
+        0%   { opacity: 0; transform: translateY(6px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Reduced motion: stamp the final frame; no float, no bloom
+         fade-in, no rise. */
+      @media (prefers-reduced-motion: reduce) {
+        [data-ct-theme="tide-letters"] .tl-float-word,
+        [data-ct-theme="tide-letters"] .tl-letter,
+        [data-ct-theme="tide-letters"] .tl-letter-cta,
+        [data-ct-theme="tide-letters"][data-state="done"] [data-slot="effect-layer"] {
+          animation: none;
+        }
+        [data-ct-theme="tide-letters"] .tl-float-word,
+        [data-ct-theme="tide-letters"] .tl-letter,
+        [data-ct-theme="tide-letters"] .tl-letter-cta {
+          opacity: 1;
+          transform: none;
+          filter: none;
+        }
+        [data-ct-theme="tide-letters"][data-state="done"] [data-slot="effect-layer"] {
+          display: none;
+        }
       }
     `,
     fontsReady: `
@@ -547,15 +699,17 @@ export const tideLettersTheme: CountdownTheme = {
       },
     ],
   },
-  // Phase 3 — T-zero scene. The tide swallows the page (handled by the
-  // .tl-pool CSS keyed off data-state="done"); a watercolor-bloom canvas
-  // disperses the ink; the event title floats up to the surface.
+  // Phase 3 — T-zero scene: "The Letter Arrives". The tide fills the
+  // page (existing .tl-pool keyed off data-state="done"), a single
+  // watercolor bloom disperses the ink (capped at ~2.4s by the `done`
+  // CSS), the event title floats up as the letterhead, and a paper
+  // card with dispatch + signature + CTA fades up onto the tide.
   doneLayout: {
     id: 'done-root',
     type: 'group',
     classes: {
       className: {
-        base: 'relative min-h-screen w-full flex items-center justify-center px-6 overflow-hidden',
+        base: 'relative min-h-screen w-full flex flex-col items-center justify-center px-6 py-10 overflow-hidden',
       },
     },
     children: [
@@ -566,20 +720,20 @@ export const tideLettersTheme: CountdownTheme = {
         props: { kind: 'gradient' },
         classes: { className: { base: 'tl-pool' } },
       },
-      // Watercolor bloom canvas — fires bursts continuously after the
-      // done state mounts, simulating ink dispersing underwater.
+      // Watercolor bloom canvas — refires on secondTick (preserved so
+      // the dispersal feels continuous during the reveal); the `done`
+      // CSS fades the layer's opacity out by t≈3.6s so the visible
+      // bloom escalates then settles instead of looping forever.
       {
         id: 'bloom',
         type: 'effect-layer',
         props: {
           effect: 'watercolor-bloom',
-          // Phase 4 — bus-event trigger. Refire on every secondTick post-
-          // zero so the bloom keeps unfolding rather than freezing.
           trigger: 'secondTick',
         },
         classes: { className: { base: 'absolute inset-0' } },
       },
-      // The floating word: the event title rises through the bloom.
+      // Letterhead — the floating event title rises through the bloom.
       {
         id: 'float',
         type: 'event-title',
@@ -587,6 +741,44 @@ export const tideLettersTheme: CountdownTheme = {
         classes: {
           className: { base: 'relative z-10 tl-float-word' },
         },
+      },
+      // The letter — paper card on the tide carrying dateline, the
+      // italic dispatch (subtitle), signature, and the primary CTA.
+      {
+        id: 'letter',
+        type: 'group',
+        classes: { className: { base: 'relative z-10 tl-letter' } },
+        children: [
+          // Dateline (decorative text via ::before).
+          {
+            id: 'letter-dateline',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: { className: { base: 'tl-letter-dateline' } },
+          },
+          // Italic body — the dispatch line, taken from the event
+          // subtitle so both pieces of event copy reach done.
+          {
+            id: 'letter-body',
+            type: 'event-title',
+            props: { source: 'subtitle' },
+            classes: { className: { base: 'tl-letter-body' } },
+          },
+          // Signature flourish (decorative text via ::before).
+          {
+            id: 'letter-signature',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: { className: { base: 'tl-letter-signature' } },
+          },
+          // CTA — quiet italic link with moonstone underline.
+          {
+            id: 'letter-cta',
+            type: 'background',
+            props: { kind: 'gradient' },
+            classes: { className: { base: 'tl-letter-cta select-none' } },
+          },
+        ],
       },
     ],
   },
