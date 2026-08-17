@@ -29,7 +29,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@tanstack/react-router": "^1.170.25",
+    "@tanstack/react-router": "^1.170.27",
     "clsx": "^2.1.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
